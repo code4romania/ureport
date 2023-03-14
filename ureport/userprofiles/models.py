@@ -29,9 +29,9 @@ class UserProfile(models.Model):
     
     # We do not use a ForeignKey because there can be several "Contacts" with
     # the same imported UUID but assigned to different Orgs
-    contact_uuid = models.CharField(
-        verbose_name=_("Contact UUID"), max_length=36, blank=True, null=False, default="",
-        db_index=True)
+    rapidpro_uuid = models.CharField(
+        verbose_name=_("RapidPro Contact UUID"), 
+        max_length=36, blank=True, null=False, default="", db_index=True)
 
     image = models.ImageField(
         verbose_name=_("Image"), 

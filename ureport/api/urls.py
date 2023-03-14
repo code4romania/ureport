@@ -235,10 +235,37 @@ urlpatterns = [
         create_user, 
         name="api.v1.userprofiles_signup"
     ),
+    # re_path(
+    #     r"^userprofiles/forgot/$", 
+    #     create_user, 
+    #     name="api.v1.userprofiles_forgot_initial"
+    # ),
+    # re_path(
+    #     r"^userprofiles/forgot/check/$", 
+    #     create_user, 
+    #     name="api.v1.userprofiles_forgot_check"
+    # ),
+    # re_path(
+    #     r"^userprofiles/forgot/password/$", 
+    #     create_user, 
+    #     name="api.v1.userprofiles_forgot_change"
+    # ),
     re_path(
-        r"^userprofiles/changepassword/(?P<user_id>[\d]+)/$", 
+        r"^userprofiles/changepassword/(?P<user_id>[\d]+)/$",  # deprecated endpoint
+        change_password, 
+        name="api.v1.userprofiles_change_password_DEPRECATED"
+    ),
+    re_path(
+        r"^userprofiles/user/(?P<user_id>[\d]+)/password/$", 
         change_password, 
         name="api.v1.userprofiles_change_password"
+    ),
+    re_path(
+        r"^userprofiles/user/@me/$",
+        UserViewSet.as_view({
+            "get": "retrieve_current_user_with_profile",
+        }), 
+        name="api.v1.userprofiles_current"
     ),
     re_path(
         r"^userprofiles/user/(?P<user_id>[\d]+)/$",

@@ -1,6 +1,7 @@
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 
+CURRENT_USER_API_PATH =  "user/@me/"
 USER_API_PATH = "user/(?P<user_id>[\d]+)"
 STORY_API_PATH = "story/(?P<story_id>[\d]+)"
 USER_STORY_API_PATH = "{}/{}".format(USER_API_PATH, STORY_API_PATH)

@@ -83,7 +83,7 @@ class UserBadgeViewSet(ModelViewSet):
     @action(detail=False, methods=['get'], url_path=USER_API_PATH)
     def retrieve_user_badges(self, request, user_id):
         """
-        Get the user badges belonging to the current user
+        Get the user badges belonging to the specified user
         """
         
         queryset = self.get_queryset().filter(user_id=user_id)

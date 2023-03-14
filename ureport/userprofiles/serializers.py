@@ -8,15 +8,31 @@ from ureport.userprofiles.models import UserProfile
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ("contact_uuid", "image", )
+        fields = (
+            "rapidpro_uuid", 
+            "image", 
+        )
 
 
-class UserWithProfileSerializer(serializers.ModelSerializer):
+class UserWithProfileReadSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer(source='userprofile', read_only=True)
 
     class Meta:
         model = User
-        fields = ("username", "email", "first_name", "last_name", "profile")
+        fields = ("id", "username", "email", "first_name", "last_name", "profile")
+        read_only_fields = fields
+
+    def to_representation(self, instance):
+        """
+        Move fields from UserProfile to User representation.
+        Make sure that field names do not overlap!
+        """
+        representation = super().to_representation(instance)
+        profile_representation = representation.pop('profile')
+        if profile_representation:
+            for key in profile_representation:
+                representation[key] = profile_representation[key]
+        return representation
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
