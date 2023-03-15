@@ -1864,6 +1864,11 @@ SWAGGER_SETTINGS = {"SECURITY_DEFINITIONS": {"basic": {"type": "basic"}}}
 STORY_WIDGET_URL = "https://ureportapp.ilhasoft.mobi/widget/"
 
 
+SILENCED_SYSTEM_CHECKS = [
+    "debug_toolbar.W006",
+]
+
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": True,
