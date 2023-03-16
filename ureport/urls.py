@@ -67,7 +67,6 @@ urlpatterns = [
     re_path(r"^users/", include("dash.users.urls")),
     re_path(r"^manage/", include("smartmin.csv_imports.urls")),
     re_path(r"^api/$", RedirectView.as_view(pattern_name="api.v1.docs", permanent=False), name="api"),
-    re_path(r'^api/v1/get-auth-token/$', obtain_auth_token, name="get-auth-token"),
     re_path(r"^api/v1/", include("ureport.api.urls")),
     re_path(r"^jsi18n/$", JavaScriptCatalog.as_view(), name="javascript-catalog"),
 ]

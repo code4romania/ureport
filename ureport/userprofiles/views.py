@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.http import Http404
-from rest_framework import decorators
+from rest_framework import decorators, status
+from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -19,6 +20,36 @@ from ureport.userprofiles.serializers import (
     ResetPasswordSerializer,
 )
 
+class SerializerErrorResponse(Response):
+
+    def __init__(self, data=""):
+        if type(data) is str:
+            output = {
+                "detail": data,
+                "errors": data,
+            }
+        else:
+            output = {
+                "detail": data[list(data)[0]][0],  # The text of an error message from a dict of error messages
+                "errors": data,
+            }
+        return super().__init__(output, status=status.HTTP_400_BAD_REQUEST)
+   
+
+
+class CustomAuthToken(ObtainAuthToken):
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        if serializer.is_valid():
+            user = serializer.validated_data['user']
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({
+                "token": token.key,
+            })
+        else:
+            return SerializerErrorResponse(serializer.errors)
 
 
 class UserViewSet(GenericViewSet):
@@ -39,32 +70,39 @@ class UserViewSet(GenericViewSet):
     @decorators.action(detail=False, methods=['post'])
     def reset_password(self, request):
         serializer = ResetPasswordSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({"message": "OK"})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"detail": "OK"})
+        else:
+            return SerializerErrorResponse(serializer.errors)
 
     @decorators.action(detail=False, methods=['post'])
     def create_user(self, request):
         serializer = CreateUserSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        token = Token.objects.get_or_create(user=user)[0]
-        return Response({
-            "id": user.id,
-            "token": token.key,
-        })
+        if serializer.is_valid():
+            user = serializer.save()
+            token = Token.objects.get_or_create(user=user)[0]
+            return Response({
+                "id": user.id,
+                "token": token.key,
+            })
+        else:
+            return SerializerErrorResponse(serializer.errors)
 
     @decorators.action(detail=False, methods=['post'], url_path=USER_API_PATH)
     def change_password(self, request, user_id):
         try:
             user = User.objects.get(pk=user_id)
         except User.DoesNotExist:
-            raise Http404
+            return SerializerErrorResponse("User does not exist")
 
         serializer = ChangePasswordSerializer(instance=user, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({"message": "OK"})
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"detail": "OK"})
+        else:
+            return SerializerErrorResponse(serializer.errors)
 
     @decorators.action(detail=False, methods=['get'], url_path=CURRENT_USER_API_PATH)
     def retrieve_current_user_with_profile(self, request):
@@ -88,7 +126,10 @@ class UserViewSet(GenericViewSet):
             }
         """
         user_id = request.user.id
-        queryset = self.get_queryset().filter(id=user_id).get()
+        try:
+            queryset = self.get_queryset().filter(id=user_id).get()
+        except User.DoesNotExist:
+            raise Http404
         serializer = UserWithProfileReadSerializer(queryset, many=False)
         return Response(serializer.data)
 

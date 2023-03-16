@@ -35,7 +35,7 @@ from ureport.storyextras.views import (
     TempViewSet,
 )
 from ureport.userbadges.views import UserBadgeViewSet
-from ureport.userprofiles.views import UserViewSet
+from ureport.userprofiles.views import CustomAuthToken, UserViewSet
 
 
 schema_view = get_swagger_view(title="API")
@@ -60,6 +60,9 @@ urlpatterns = [
     re_path(r"^stories/org/(?P<org>[\d]+)/$", StoryList.as_view(), name="api.v1.org_story_list"),
     re_path(r"^stories/(?P<pk>[\d]+)/$", StoryDetails.as_view(), name="api.v1.story_details"),
     
+    # Authentication
+    re_path(r"^get-auth-token/", CustomAuthToken.as_view()),
+
     # Swagger UI for documentation
     re_path(r"^swagger/schema/", SpectacularAPIView.as_view(), name="api.v1.schema"),
     re_path(r"^swagger/", SpectacularSwaggerView.as_view(url_name='api.v1.schema'), name='swagger-ui'),
