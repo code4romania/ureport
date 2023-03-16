@@ -1,4 +1,5 @@
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 
 CURRENT_USER_API_PATH =  "user/@me/"
@@ -34,3 +35,19 @@ class IsOwnerUserOrAdmin(IsAuthenticated):
             return True
         else:
             return False
+
+
+class SerializerErrorResponse(Response):
+
+    def __init__(self, data=""):
+        if type(data) in (str, type(_(""))):
+            output = {
+                "detail": data,
+                "errors": data,
+            }
+        else:
+            output = {
+                "detail": data[list(data)[0]][0],  # The text of an error message from a dict of error messages
+                "errors": data,
+            }
+        return super().__init__(output, status=status.HTTP_400_BAD_REQUEST)

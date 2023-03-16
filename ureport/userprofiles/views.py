@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.http import Http404
-from rest_framework import decorators, status
+from django.utils.translation import gettext_lazy as _
+from rest_framework import decorators
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
@@ -9,9 +10,11 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from ureport.apiextras.views import (
     IsOwnerUserOrAdmin,
+    SerializerErrorResponse,
     USER_API_PATH,
     CURRENT_USER_API_PATH,
 )
+from ureport.userprofiles.models import UserProfile
 from ureport.userprofiles.serializers import (
     UserWithProfileReadSerializer,
     UserProfileSerializer, 
@@ -19,22 +22,6 @@ from ureport.userprofiles.serializers import (
     ChangePasswordSerializer,
     ResetPasswordSerializer,
 )
-
-class SerializerErrorResponse(Response):
-
-    def __init__(self, data=""):
-        if type(data) is str:
-            output = {
-                "detail": data,
-                "errors": data,
-            }
-        else:
-            output = {
-                "detail": data[list(data)[0]][0],  # The text of an error message from a dict of error messages
-                "errors": data,
-            }
-        return super().__init__(output, status=status.HTTP_400_BAD_REQUEST)
-   
 
 
 class CustomAuthToken(ObtainAuthToken):
@@ -52,22 +39,21 @@ class CustomAuthToken(ObtainAuthToken):
             return SerializerErrorResponse(serializer.errors)
 
 
-class UserViewSet(GenericViewSet):
+class UserProfileViewSet(GenericViewSet):
     """
     """
     
-    serializer_class = UserWithProfileReadSerializer
     queryset = User.objects.all()
-    # model = User
+    model = UserProfile
 
-    def get_permission(self):
+    def get_permissions(self):
         if self.action == "retrieve_current_user_with_profile":
             return [IsAuthenticated()]
-        elif self.action in ("create_user", "forgot_initial", "forgot_check", "forgot_change"):
+        elif self.action in ("create_user", "reset_password"):
             return []
         return [IsOwnerUserOrAdmin()]
 
-    @decorators.action(detail=False, methods=['post'])
+    @decorators.action(detail=False, methods=('post',))
     def reset_password(self, request):
         serializer = ResetPasswordSerializer(data=request.data)
         if serializer.is_valid():
@@ -76,7 +62,7 @@ class UserViewSet(GenericViewSet):
         else:
             return SerializerErrorResponse(serializer.errors)
 
-    @decorators.action(detail=False, methods=['post'])
+    @decorators.action(detail=False, methods=('post',))
     def create_user(self, request):
         serializer = CreateUserSerializer(data=request.data)
         if serializer.is_valid():
@@ -89,10 +75,10 @@ class UserViewSet(GenericViewSet):
         else:
             return SerializerErrorResponse(serializer.errors)
 
-    @decorators.action(detail=False, methods=['post'], url_path=USER_API_PATH)
+    @decorators.action(detail=False, methods=('post',), url_path=USER_API_PATH)
     def change_password(self, request, user_id):
         try:
-            user = User.objects.get(pk=user_id)
+            user = self.get_queryset().get(pk=user_id)
         except User.DoesNotExist:
             return SerializerErrorResponse("User does not exist")
 
@@ -104,7 +90,7 @@ class UserViewSet(GenericViewSet):
         else:
             return SerializerErrorResponse(serializer.errors)
 
-    @decorators.action(detail=False, methods=['get'], url_path=CURRENT_USER_API_PATH)
+    @decorators.action(detail=False, methods=('get',), url_path=CURRENT_USER_API_PATH)
     def retrieve_current_user_with_profile(self, request):
         """
         Retrieve the current User and their UserProfile
@@ -127,13 +113,13 @@ class UserViewSet(GenericViewSet):
         """
         user_id = request.user.id
         try:
-            queryset = self.get_queryset().filter(id=user_id).get()
+            queryset = self.get_queryset().get(pk=user_id)
         except User.DoesNotExist:
             raise Http404
         serializer = UserWithProfileReadSerializer(queryset, many=False)
         return Response(serializer.data)
 
-    @decorators.action(detail=False, methods=['get'], url_path=USER_API_PATH)
+    @decorators.action(detail=False, methods=('get',), url_path=USER_API_PATH)
     def retrieve_user_with_profile(self, request, user_id):
         """
         Retrieve the User and their UserProfile
@@ -154,6 +140,38 @@ class UserViewSet(GenericViewSet):
                 "image": "string" | null
             }
         """
-        queryset = self.get_queryset().filter(id=user_id).get()
+
+        try:
+            queryset = self.get_queryset().get(pk=user_id)
+        except User.DoesNotExist:
+            raise Http404
+
         serializer = UserWithProfileReadSerializer(queryset, many=False)
         return Response(serializer.data)
+
+    @decorators.action(detail=False, methods=('delete',), url_path=USER_API_PATH)
+    def delete_user(self, request, user_id):
+        """
+        Delete the User and their UserProfile
+
+        Example:
+            
+            DELETE /api/v1/userprofiles/user/3/
+
+        Response will contain the operation status
+
+            {
+                "detail": "OK"
+            }
+        """
+
+        try:
+            queryset = self.get_queryset().get(pk=user_id)
+        except User.DoesNotExist:
+            raise Http404
+
+        if queryset.is_staff:
+            return SerializerErrorResponse(_("Cannot delete an admin account"))
+        else:
+            queryset.delete()
+            return Response({"detail": "OK"})

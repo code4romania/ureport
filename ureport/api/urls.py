@@ -35,7 +35,7 @@ from ureport.storyextras.views import (
     TempViewSet,
 )
 from ureport.userbadges.views import UserBadgeViewSet
-from ureport.userprofiles.views import CustomAuthToken, UserViewSet
+from ureport.userprofiles.views import CustomAuthToken, UserProfileViewSet
 
 
 schema_view = get_swagger_view(title="API")
@@ -231,57 +231,58 @@ urlpatterns = [
     # UserProfiles API
     re_path(
         r"^userprofiles/signup/$", 
-        UserViewSet.as_view({
+        UserProfileViewSet.as_view({
             "post": "create_user",
         }),
         name="api.v1.userprofiles_signup"
     ),
     re_path(
         r"^userprofiles/forgot/$", 
-        UserViewSet.as_view({
+        UserProfileViewSet.as_view({
             "post": "reset_password",
         }),
         name="api.v1.userprofiles_forgot_initial"
     ),
     re_path(
         r"^userprofiles/forgot/check/$", 
-        UserViewSet.as_view({
+        UserProfileViewSet.as_view({
             "post": "reset_password",
         }),
         name="api.v1.userprofiles_forgot_check"
     ),
     re_path(
         r"^userprofiles/forgot/password/$", 
-        UserViewSet.as_view({
+        UserProfileViewSet.as_view({
             "post": "reset_password",
         }),
         name="api.v1.userprofiles_forgot_change"
     ),
     re_path(
         r"^userprofiles/changepassword/(?P<user_id>[\d]+)/$",  # deprecated endpoint
-        UserViewSet.as_view({
+        UserProfileViewSet.as_view({
             "post": "change_password",
         }), 
         name="api.v1.userprofiles_change_password_DEPRECATED"
     ),
     re_path(
         r"^userprofiles/user/(?P<user_id>[\d]+)/password/$", 
-        UserViewSet.as_view({
+        UserProfileViewSet.as_view({
             "post": "change_password",
         }),
         name="api.v1.userprofiles_change_password"
     ),
     re_path(
         r"^userprofiles/user/@me/$",
-        UserViewSet.as_view({
+        UserProfileViewSet.as_view({
             "get": "retrieve_current_user_with_profile",
         }), 
         name="api.v1.userprofiles_current"
     ),
     re_path(
         r"^userprofiles/user/(?P<user_id>[\d]+)/$",
-        UserViewSet.as_view({
+        UserProfileViewSet.as_view({
             "get": "retrieve_user_with_profile",
+            "delete": "delete_user",
         }), 
         name="api.v1.userprofiles_as_user"
     ),
