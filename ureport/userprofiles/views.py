@@ -4,7 +4,7 @@ from rest_framework import decorators
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from ureport.apiextras.views import (
     IsOwnerUserOrAdmin,
@@ -19,44 +19,47 @@ from ureport.userprofiles.serializers import (
 )
 
 
-@decorators.api_view(["POST"])
-def create_user(request):
-    serializer = CreateUserSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    user = serializer.save()
-    token = Token.objects.get_or_create(user=user)[0]
-    return Response({
-        "id": user.id,
-        "token": token.key,
-    })
 
-
-@decorators.api_view(["POST"])
-@decorators.permission_classes([IsOwnerUserOrAdmin])
-def change_password(request, user_id):
-    try:
-        user = User.objects.get(pk=user_id)
-    except User.DoesNotExist:
-        raise Http404
-
-    serializer = ChangePasswordSerializer(instance=user, data=request.data)
-    serializer.is_valid(raise_exception=True)
-    serializer.save()
-    return Response({})
-
-
-class UserViewSet(ModelViewSet):
+class UserViewSet(GenericViewSet):
     """
     """
     
     serializer_class = UserWithProfileReadSerializer
     queryset = User.objects.all()
-    model = User
+    # model = User
 
     def get_permission(self):
         if self.action == "retrieve_current_user_with_profile":
             return [IsAuthenticated()]
+        elif self.action == "create_user":
+            return []
         return [IsOwnerUserOrAdmin()]
+
+    # @decorators.api_view(["POST"])
+    @decorators.action(detail=False, methods=['post'])
+    def create_user(request):
+        serializer = CreateUserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        token = Token.objects.get_or_create(user=user)[0]
+        return Response({
+            "id": user.id,
+            "token": token.key,
+        })
+
+    # @decorators.api_view(["POST"])
+    # @decorators.permission_classes([IsOwnerUserOrAdmin])
+    @decorators.action(detail=False, methods=['post'], url_path=USER_API_PATH)
+    def change_password(request, user_id):
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            raise Http404
+
+        serializer = ChangePasswordSerializer(instance=user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({})
 
     @decorators.action(detail=False, methods=['get'], url_path=CURRENT_USER_API_PATH)
     def retrieve_current_user_with_profile(self, request):

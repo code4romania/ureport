@@ -35,11 +35,7 @@ from ureport.storyextras.views import (
     TempViewSet,
 )
 from ureport.userbadges.views import UserBadgeViewSet
-from ureport.userprofiles.views import (
-    create_user, 
-    change_password,
-    UserViewSet,
-)
+from ureport.userprofiles.views import UserViewSet
 
 
 schema_view = get_swagger_view(title="API")
@@ -232,7 +228,9 @@ urlpatterns = [
     # UserProfiles API
     re_path(
         r"^userprofiles/signup/$", 
-        create_user, 
+        UserViewSet.as_view({
+            "post": "create_user",
+        }),
         name="api.v1.userprofiles_signup"
     ),
     # re_path(
@@ -252,12 +250,16 @@ urlpatterns = [
     # ),
     re_path(
         r"^userprofiles/changepassword/(?P<user_id>[\d]+)/$",  # deprecated endpoint
-        change_password, 
+        UserViewSet.as_view({
+            "post": "change_password",
+        }), 
         name="api.v1.userprofiles_change_password_DEPRECATED"
     ),
     re_path(
         r"^userprofiles/user/(?P<user_id>[\d]+)/password/$", 
-        change_password, 
+        UserViewSet.as_view({
+            "post": "change_password",
+        }),
         name="api.v1.userprofiles_change_password"
     ),
     re_path(
