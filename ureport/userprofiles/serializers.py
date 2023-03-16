@@ -39,10 +39,11 @@ class UserWithProfileReadSerializer(serializers.ModelSerializer):
 
 class CreateUserSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(max_length=128)
+    rapidpro_uuid = serializers.CharField(max_length=36, required=False)
 
     class Meta:
         model = User
-        fields = ("full_name", "email", "password")
+        fields = ("full_name", "email", "password", "rapidpro_uuid")
 
     def validate_email(self, value):
         clean_email = value.strip()        
@@ -56,20 +57,25 @@ class CreateUserSerializer(serializers.ModelSerializer):
             return clean_email
 
     def create(self, validated_data):
-        split_name = validated_data["full_name"].split(" ")
+        split_name = validated_data.get("full_name","").split(" ")
         
         first_name = split_name[0]
         if len(split_name) > 1:
             last_name = split_name[1]
 
         user = User(
-            email=validated_data["email"],
-            username=validated_data["email"],
+            email=validated_data.get("email"),
+            username=validated_data.get("email"),
             first_name=first_name,
             last_name=last_name,
         )
-        user.set_password(validated_data["password"])
+        user.set_password(validated_data.get("password"))
         user.save()
+
+        profile, _ = UserProfile.objects.get_or_create(user=user)
+        profile.rapidpro_uuid = validated_data.get("rapidpro_uuid", "")
+        profile.save()
+        
         return user
 
 
