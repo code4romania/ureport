@@ -1,3 +1,5 @@
+from datetime import timedelta
+from random import randint
 from functools import partial
 
 from dash.utils import generate_file_path
@@ -7,6 +9,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.authtoken.models import Token
 
@@ -61,6 +64,23 @@ class UserProfile(models.Model):
     class Meta:
         verbose_name = _("User profile")
         verbose_name_plural = _("Use profiles")
+
+    def generate_reset_code(self):
+        self.password_reset_code = "{}".format(randint(1000, 9999))
+        self.password_reset_retries = 0
+        self.password_reset_expiry = timezone.now() + timedelta(hours=6)
+        self.save()
+
+    def increment_reset_retries(self):
+        self.password_reset_retries += 1
+        self.save()
+
+    def validate_reset_code(self, input):
+        if timezone.now() > self.password_reset_expiry:
+            return False
+        if input != self.password_reset_code:
+            return False
+        return True
 
 
 @receiver(post_save, sender=User)

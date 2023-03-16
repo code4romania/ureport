@@ -233,21 +233,27 @@ urlpatterns = [
         }),
         name="api.v1.userprofiles_signup"
     ),
-    # re_path(
-    #     r"^userprofiles/forgot/$", 
-    #     create_user, 
-    #     name="api.v1.userprofiles_forgot_initial"
-    # ),
-    # re_path(
-    #     r"^userprofiles/forgot/check/$", 
-    #     create_user, 
-    #     name="api.v1.userprofiles_forgot_check"
-    # ),
-    # re_path(
-    #     r"^userprofiles/forgot/password/$", 
-    #     create_user, 
-    #     name="api.v1.userprofiles_forgot_change"
-    # ),
+    re_path(
+        r"^userprofiles/forgot/$", 
+        UserViewSet.as_view({
+            "post": "reset_password",
+        }),
+        name="api.v1.userprofiles_forgot_initial"
+    ),
+    re_path(
+        r"^userprofiles/forgot/check/$", 
+        UserViewSet.as_view({
+            "post": "reset_password",
+        }),
+        name="api.v1.userprofiles_forgot_check"
+    ),
+    re_path(
+        r"^userprofiles/forgot/password/$", 
+        UserViewSet.as_view({
+            "post": "reset_password",
+        }),
+        name="api.v1.userprofiles_forgot_change"
+    ),
     re_path(
         r"^userprofiles/changepassword/(?P<user_id>[\d]+)/$",  # deprecated endpoint
         UserViewSet.as_view({

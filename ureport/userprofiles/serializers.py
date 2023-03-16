@@ -1,4 +1,6 @@
 from django.contrib.auth.models import User
+from django.conf import settings
+from django.core.mail import send_mail
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -69,6 +71,58 @@ class CreateUserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data["password"])
         user.save()
         return user
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    code = serializers.CharField(required=False)
+    new_password = serializers.CharField(max_length=128, required=False)
+    new_password2 = serializers.CharField(max_length=128, required=False)
+
+    def validate_email(self, value):
+        clean_email = value.strip()        
+        if len(clean_email.split("@")) != 2:
+            raise serializers.ValidationError(_("Wrong email format"))
+        return clean_email
+    
+    def validate(self, data):
+        try:
+            self.instance = User.objects.get(username__iexact=data.get("email"))
+        except User.DoesNotExist:
+            raise serializers.ValidationError(_("User does not exist"))
+
+        if data.get("code") and data.get("code") != self.instance.userprofile.password_reset_code:
+            raise serializers.ValidationError(_("Wrong code"))
+
+        if data.get("new_password") != data.get("new_password2"):
+            raise serializers.ValidationError(_("The new passwords do not match"))
+
+        return data
+
+    def save(self):
+        if self.validated_data.get("code"):
+            # We have a validated code
+            if self.validated_data.get("new_password"):
+                # and a new password has been provided
+                self.instance.set_password(self.validated_data.get("new_password"))
+                self.instance.save()
+                self.instance.userprofile.password_reset_code = ""
+                self.instance.userprofile.save()
+            else:
+                self.instance.userprofile.increment_reset_retries()
+                self.instance.userprofile.save()
+        else:
+            # The frontend only provided the email address
+            self.instance.userprofile.generate_reset_code()
+            print("CODE = ", self.instance.userprofile.password_reset_code)
+            send_mail(
+                _("Password reset code"),
+                _("Your password reset code is: {}".format(self.instance.userprofile.password_reset_code)),
+                settings.DEFAULT_FROM_EMAIL,
+                [self.instance.email],
+                fail_silently=False,
+            )
+        return self.instance
 
 
 class ChangePasswordSerializer(serializers.Serializer):

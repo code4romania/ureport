@@ -16,6 +16,7 @@ from ureport.userprofiles.serializers import (
     UserProfileSerializer, 
     CreateUserSerializer,
     ChangePasswordSerializer,
+    ResetPasswordSerializer,
 )
 
 
@@ -31,13 +32,19 @@ class UserViewSet(GenericViewSet):
     def get_permission(self):
         if self.action == "retrieve_current_user_with_profile":
             return [IsAuthenticated()]
-        elif self.action == "create_user":
+        elif self.action in ("create_user", "forgot_initial", "forgot_check", "forgot_change"):
             return []
         return [IsOwnerUserOrAdmin()]
 
-    # @decorators.api_view(["POST"])
     @decorators.action(detail=False, methods=['post'])
-    def create_user(request):
+    def reset_password(self, request):
+        serializer = ResetPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message": "OK"})
+
+    @decorators.action(detail=False, methods=['post'])
+    def create_user(self, request):
         serializer = CreateUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
@@ -47,10 +54,8 @@ class UserViewSet(GenericViewSet):
             "token": token.key,
         })
 
-    # @decorators.api_view(["POST"])
-    # @decorators.permission_classes([IsOwnerUserOrAdmin])
     @decorators.action(detail=False, methods=['post'], url_path=USER_API_PATH)
-    def change_password(request, user_id):
+    def change_password(self, request, user_id):
         try:
             user = User.objects.get(pk=user_id)
         except User.DoesNotExist:
@@ -59,7 +64,7 @@ class UserViewSet(GenericViewSet):
         serializer = ChangePasswordSerializer(instance=user, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({})
+        return Response({"message": "OK"})
 
     @decorators.action(detail=False, methods=['get'], url_path=CURRENT_USER_API_PATH)
     def retrieve_current_user_with_profile(self, request):
