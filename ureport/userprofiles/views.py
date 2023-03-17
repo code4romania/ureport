@@ -1,6 +1,9 @@
 from django.contrib.auth.models import User
 from django.http import Http404
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.cache import never_cache
+from django.views.decorators.vary import vary_on_cookie, vary_on_headers
 from rest_framework import decorators
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -26,13 +29,15 @@ from ureport.userprofiles.serializers import (
 
 class CustomAuthToken(ObtainAuthToken):
 
+    @method_decorator(never_cache)
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data,
-                                           context={'request': request})
+        serializer = self.serializer_class(
+            data=request.data, context={'request': request})
         if serializer.is_valid():
-            user = serializer.validated_data['user']
+            user = serializer.validated_data.get('user')
             token, created = Token.objects.get_or_create(user=user)
             return Response({
+                "id": user.pk,
                 "token": token.key,
             })
         else:
@@ -45,6 +50,16 @@ class UserProfileViewSet(GenericViewSet):
     
     queryset = User.objects.all()
     model = UserProfile
+
+    def get_serializer_class(self):
+        if self.action == "reset_password":
+            return ResetPasswordSerializer
+        elif self.action == "change_password":
+            return ChangePasswordSerializer
+        elif self.action == "create_user":
+            return CreateUserSerializer
+        else:
+            return UserWithProfileReadSerializer
 
     def get_permissions(self):
         if self.action == "retrieve_current_user_with_profile":
@@ -91,6 +106,7 @@ class UserProfileViewSet(GenericViewSet):
             return SerializerErrorResponse(serializer.errors)
 
     @decorators.action(detail=False, methods=('get',), url_path=CURRENT_USER_API_PATH)
+    @method_decorator(vary_on_headers("Authorization",))
     def retrieve_current_user_with_profile(self, request):
         """
         Retrieve the current User and their UserProfile

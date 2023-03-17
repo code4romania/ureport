@@ -37,6 +37,11 @@ class UserWithProfileReadSerializer(serializers.ModelSerializer):
         return representation
 
 
+class UserWithProfileSerializer(serializers.ModelSerializer):
+    # TODO
+    pass
+
+
 class CreateUserSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(max_length=128)
     rapidpro_uuid = serializers.CharField(max_length=36, required=False)
@@ -152,16 +157,3 @@ class ChangePasswordSerializer(serializers.Serializer):
         self.instance.set_password(self.validated_data["new_password"])
         self.instance.save()
         return self.instance
-
-
-# class ForgotPasswordSerializer(serializers.Serializer):
-#     # TODO:
-#     # The .instance attribute will be the current User
-#     user_id = serializers.IntegerField()
-#     email = serializers.EmailField()
-#     code = serializers.CharField()
-#     new_password = serializers.CharField(max_length=128)
-#     new_password2 = serializers.CharField(max_length=128)
-
-#     def save(self):
-#         pass
