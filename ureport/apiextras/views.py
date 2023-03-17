@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 
-CURRENT_USER_API_PATH =  "user/@me/"
+CURRENT_USER_API_PATH = "user/@me/"
 USER_API_PATH = "user/(?P<user_id>[\d]+)"
 STORY_API_PATH = "story/(?P<story_id>[\d]+)"
 USER_STORY_API_PATH = "{}/{}".format(USER_API_PATH, STORY_API_PATH)
@@ -45,7 +45,6 @@ class SerializerErrorResponse(Response):
         if type(data) in (str, type(_(""))):
             output = {
                 "detail": data,
-                "errors": data,
             }
         else:
             output = {
