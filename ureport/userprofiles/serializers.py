@@ -11,6 +11,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = (
+            "full_name",
             "rapidpro_uuid", 
             "image", 
         )
@@ -37,9 +38,10 @@ class UserWithProfileReadSerializer(serializers.ModelSerializer):
         return representation
 
 
-class UserWithProfileSerializer(serializers.ModelSerializer):
-    # TODO
-    pass
+class UserWithProfileSerializer(serializers.Serializer):
+    # TODO:
+    full_name = serializers.CharField()
+    image = serializers.ImageField()
 
 
 class CreateUserSerializer(serializers.ModelSerializer):

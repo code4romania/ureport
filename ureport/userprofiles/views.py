@@ -20,7 +20,7 @@ from ureport.apiextras.views import (
 from ureport.userprofiles.models import UserProfile
 from ureport.userprofiles.serializers import (
     UserWithProfileReadSerializer,
-    UserProfileSerializer, 
+    UserWithProfileSerializer, 
     CreateUserSerializer,
     ChangePasswordSerializer,
     ResetPasswordSerializer,
@@ -52,6 +52,7 @@ class UserProfileViewSet(GenericViewSet):
     model = UserProfile
 
     def get_serializer_class(self):
+        # TODO: Replace hardcoded serializers in actions
         if self.action == "reset_password":
             return ResetPasswordSerializer
         elif self.action == "change_password":
@@ -67,6 +68,10 @@ class UserProfileViewSet(GenericViewSet):
         elif self.action in ("create_user", "reset_password"):
             return []
         return [IsOwnerUserOrAdmin()]
+
+    def partial_update(self, request, user_id):
+        # TODO:
+        pass
 
     @decorators.action(detail=False, methods=('post',))
     def reset_password(self, request):

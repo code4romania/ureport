@@ -82,6 +82,10 @@ class UserProfile(models.Model):
             return False
         return True
 
+    @property
+    def full_name(self):
+        return "{} {}".format(self.user.first_name, self.user.last_name)
+
 
 @receiver(post_save, sender=User)
 def auto_create_user_profile(sender, instance, **kwargs):
