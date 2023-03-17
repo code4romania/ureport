@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.vary import vary_on_cookie, vary_on_headers
 from rest_framework import decorators
+from rest_framework import status
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
@@ -80,7 +81,10 @@ class UserProfileViewSet(GenericViewSet):
         serializer = UserWithProfileUpdateSerializer(data=request.data, instance=user)
         if serializer.is_valid():
             serializer.save()
-            return Response({"detail": "OK"})
+            return Response(
+                UserWithProfileReadSerializer(user).data, 
+                status=status.HTTP_200_OK
+            )
         else:
             return SerializerErrorResponse(serializer.errors)
 
@@ -106,7 +110,10 @@ class UserProfileViewSet(GenericViewSet):
 
         user.userprofile.image = image
         user.userprofile.save()
-        return Response({"detail": "OK"})
+        return Response(
+            UserWithProfileReadSerializer(user).data, 
+            status=status.HTTP_200_OK
+        )
 
     @decorators.action(detail=False, methods=('post',))
     def reset_password(self, request):
