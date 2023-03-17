@@ -32,6 +32,26 @@ class CustomAuthToken(ObtainAuthToken):
 
     @method_decorator(never_cache)
     def post(self, request, *args, **kwargs):
+        """
+        Get the authentication token
+
+        Example:
+            
+            POST /api/v1/get-auth-token/
+
+        Data:
+
+            {
+                "username":"string", 
+                "password":"string"
+            }
+
+        Response:
+
+            {
+                "token":"12345678901234567890"
+            }
+        """
         serializer = self.serializer_class(
             data=request.data, context={'request': request})
         if serializer.is_valid():
@@ -47,6 +67,7 @@ class CustomAuthToken(ObtainAuthToken):
 
 class UserProfileViewSet(GenericViewSet):
     """
+
     """
     
     queryset = User.objects.all()
@@ -73,6 +94,32 @@ class UserProfileViewSet(GenericViewSet):
         return [IsOwnerUserOrAdmin()]
 
     def partial_update(self, request, user_id):
+        """
+        Update the user's full name
+
+        Example:
+            
+            PATCH /api/v1/userprofiles/user/9/
+
+        Data:
+
+            {
+                "full_name":"John Doe" 
+            }
+
+        Response:
+
+            {
+                "id":9,
+                "username":"testemail2@EXAMPLE.COM",
+                "email":"testemail2@EXAMPLE.COM",
+                "first_name":"John",
+                "last_name":"Doe",
+                "full_name":"John Doe",
+                "rapidpro_uuid":"",
+                "image":null
+            }
+        """
         try:
             user = self.get_queryset().get(pk=user_id)
         except User.DoesNotExist:
