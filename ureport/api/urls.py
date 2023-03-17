@@ -282,9 +282,16 @@ urlpatterns = [
         r"^userprofiles/user/(?P<user_id>[\d]+)/$",
         UserProfileViewSet.as_view({
             "get": "retrieve_user_with_profile",
+            "patch": "partial_update",
             "delete": "delete_user",
         }), 
         name="api.v1.userprofiles_as_user"
     ),
-
+    re_path(
+        r"^userprofiles/user/(?P<user_id>[\d]+)/image/$",
+        UserProfileViewSet.as_view({
+            "put": "update_image",
+        }), 
+        name="api.v1.userprofiles_image"
+    ),
 ]

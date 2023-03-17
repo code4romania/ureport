@@ -20,7 +20,7 @@ from ureport.apiextras.views import (
 from ureport.userprofiles.models import UserProfile
 from ureport.userprofiles.serializers import (
     UserWithProfileReadSerializer,
-    UserWithProfileSerializer, 
+    UserWithProfileUpdateSerializer, 
     CreateUserSerializer,
     ChangePasswordSerializer,
     ResetPasswordSerializer,
@@ -59,6 +59,8 @@ class UserProfileViewSet(GenericViewSet):
             return ChangePasswordSerializer
         elif self.action == "create_user":
             return CreateUserSerializer
+        elif self.action == "partial_update":
+            UserWithProfileUpdateSerializer
         else:
             return UserWithProfileReadSerializer
 
@@ -70,8 +72,41 @@ class UserProfileViewSet(GenericViewSet):
         return [IsOwnerUserOrAdmin()]
 
     def partial_update(self, request, user_id):
-        # TODO:
-        pass
+        try:
+            user = self.get_queryset().get(pk=user_id)
+        except User.DoesNotExist:
+            return SerializerErrorResponse("User does not exist")
+            
+        serializer = UserWithProfileUpdateSerializer(data=request.data, instance=user)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"detail": "OK"})
+        else:
+            return SerializerErrorResponse(serializer.errors)
+
+    @decorators.action(detail=False, methods=('put',))
+    def update_image(self, request, user_id):
+        """
+        Update the profile image
+
+        curl -X PUT "http://example.com/api/v1/userprofiles/user/4/image/" \\
+            -H  "Content-Type: multipart/form-data" \\
+            -H "accept: application/json" \\
+            -H "Authorization: Token XXXXXXXXXXX" \\
+            -F "image=@/the/path/image.png;type=image/png"
+        """
+        try:
+            user = self.get_queryset().get(pk=user_id)
+        except User.DoesNotExist:
+            return SerializerErrorResponse("User does not exist")
+            
+        image = request.data.get("image")
+        if not image:
+            return SerializerErrorResponse(_("No image file uploaded"))
+
+        user.userprofile.image = image
+        user.userprofile.save()
+        return Response({"detail": "OK"})
 
     @decorators.action(detail=False, methods=('post',))
     def reset_password(self, request):

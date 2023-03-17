@@ -38,10 +38,20 @@ class UserWithProfileReadSerializer(serializers.ModelSerializer):
         return representation
 
 
-class UserWithProfileSerializer(serializers.Serializer):
-    # TODO:
+class UserWithProfileUpdateSerializer(serializers.Serializer):
     full_name = serializers.CharField()
-    image = serializers.ImageField()
+
+    def save(self):
+        if self.validated_data.get("full_name"):
+            split_name = self.validated_data.get("full_name","").split(" ")
+            self.instance.first_name = split_name[0]
+            if len(split_name) > 1:
+                self.instance.last_name = split_name[1]
+            else:
+                self.instance.last_name = ""
+
+        self.instance.save()
+        self.instance.userprofile.save()
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
