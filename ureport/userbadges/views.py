@@ -83,7 +83,31 @@ class UserBadgeViewSet(ModelViewSet):
     @action(detail=False, methods=['get'], url_path=USER_API_PATH)
     def retrieve_user_badges(self, request, user_id):
         """
-        Get the user badges belonging to the specified user
+        Get the user badges belonging to the specified user (optionally filtered by Org)
+
+
+        Example:
+
+            GET /api/v1/userbadges/user/321/?org=1
+
+        Result:
+
+            [
+                {
+                    "id":1,
+                    "badge_type":
+                    {
+                        "id":1,
+                        "org":1,
+                        "title":"First badge",
+                        "image":"https://example.com/media/userbadges/icon.png",
+                        "description":"You read your first story from this category!",
+                        "item_category":1
+                    },
+                    "user":321,
+                    "offered_on":"2023-03-07T20:56:53.198494+02:00"
+                }
+            ]
         """
         
         queryset = self.get_queryset().filter(user_id=user_id)

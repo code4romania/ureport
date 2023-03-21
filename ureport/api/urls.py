@@ -32,7 +32,6 @@ from ureport.storyextras.views import (
     StoryReadActionViewSet,
     StoryRewardViewSet,
     StorySettingsViewSet,
-    TempViewSet,
 )
 from ureport.userbadges.views import UserBadgeViewSet
 from ureport.userprofiles.views import CustomAuthToken, UserProfileViewSet
@@ -70,15 +69,6 @@ urlpatterns = [
     # Categories API extension:
     re_path(r"^categories/org/(?P<org>[\d]+)/$", CategoryList.as_view(), name="api.v1.org_category_list"),
     re_path(r"^categories/(?P<pk>[\d]+)/$", CategoryDetails.as_view(), name="api.v1.category_details"),
-    
-    # Temporary endpoint for retrieving the current user's id
-    re_path(
-        r"^temp/myid/$", 
-        TempViewSet.as_view({
-            "get": "my_user_id",
-        }), 
-        name="api.v1.temp_my_id"
-    ),
 
     # StorySettings API
     re_path(
@@ -256,13 +246,6 @@ urlpatterns = [
             "post": "reset_password",
         }),
         name="api.v1.userprofiles_forgot_change"
-    ),
-    re_path(
-        r"^userprofiles/changepassword/(?P<user_id>[\d]+)/$",  # deprecated endpoint
-        UserProfileViewSet.as_view({
-            "post": "change_password",
-        }), 
-        name="api.v1.userprofiles_change_password_DEPRECATED"
     ),
     re_path(
         r"^userprofiles/user/(?P<user_id>[\d]+)/password/$", 

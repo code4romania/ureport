@@ -115,23 +115,6 @@ from ureport.userbadges.serializers import UserBadgeSerializer
 #         return "%s.%s_%s" % ("stories", self.model_name.lower(), action)
 
 
-class TempViewSet(ModelViewSet):
-    """ TODO: Remove these deprecated endpoints """
-    serializer_class = StoryBookmarkSerializer
-    queryset = StoryBookmark.objects.all()
-    model = StoryBookmark
-    permission_classes = [permissions.IsAuthenticated]
-
-    @action(detail=False, methods=['get'], url_path="myid/")
-    def my_user_id(self, request):
-        """
-        *DEPRECATED*
-
-        This is a temporary endpoint which provides the current user id
-        """
-        return Response({'id': request.user.id})
-
-
 class StorySettingsViewSet(ModelViewSet):
     serializer_class = StorySettingsSerializer
     queryset = StorySettings.objects.all()
@@ -142,6 +125,7 @@ class StorySettingsViewSet(ModelViewSet):
     def retrieve_settings(self, request, story_id):
         """
         Retrieve the settings for the specified story
+
 
         Example:
 
@@ -154,6 +138,7 @@ class StorySettingsViewSet(ModelViewSet):
                 "rating":"5.00"
             }
         """
+
         try:
             story = Story.objects.get(pk=story_id)
         except Story.DoesNotExist:
@@ -224,6 +209,7 @@ class StoryBookmarkViewSet(ModelViewSet):
         """
         Retrieve the bookmarks set by the specified user
 
+
         Example:
 
             GET /api/v1/storybookmarks/user/321/
@@ -253,6 +239,7 @@ class StoryBookmarkViewSet(ModelViewSet):
                 }
             ]
         """
+
         queryset = self.model.objects.filter(user_id=user_id)
         filtered_queryset = self.filter_queryset(queryset)
         serializer = StoryBookmarkDetailedSerializer(filtered_queryset, many=True)
@@ -262,6 +249,23 @@ class StoryBookmarkViewSet(ModelViewSet):
     def remove_user_bookmarks(self, request, user_id):
         """
         Remove any bookmarks set by the specified user
+
+        Example:
+        
+            DELETE /api/v1/storybookmarks/user/321/
+
+        Data:
+
+            {
+                "story": 1
+            }
+
+        Result contains the number of deleted items: 
+        
+            {
+                "count":1
+            }
+
         """
 
         count = StoryBookmark.objects.filter(
@@ -274,6 +278,35 @@ class StoryBookmarkViewSet(ModelViewSet):
     def create_user_bookmark(self, request, user_id):
         """
         Bookmark a story for the specified user
+
+        Example:
+            
+            POST /api/v1/storybookmarks/user/321/
+
+        Data:
+
+            {
+                "story": 1
+            }
+
+        Response will contain some details about the bookmarked story:
+            
+            {
+                "id":13,
+                "user":321,
+                "story": {
+                    "id":1,
+                    "title":"Test Story",
+                    "featured":false,
+                    "summary":"asdasdasd asdasd asd",
+                    "video_id":null,
+                    "audio_link":null,
+                    "tags":null,
+                    "org":1,
+                    "images":[],
+                    "created_on":"2023-01-30T13:56:31.493752+02:00"
+                }
+            }
         """
 
         data = {
@@ -334,8 +367,41 @@ class StoryRatingViewSet(ModelViewSet):
     @action(detail=False, methods=['get'], url_path=USER_API_PATH)
     def retrieve_user_ratings(self, request, user_id):
         """
-        Get the ratings given by the specified user
+        Get the ratings given by the specified user (optionally filtered by Story)
+
+
+        Example:
+
+            GET /api/v1/storyratings/user/321/?story=1
+
+        Data:
+
+            -
+
+        Result will contain the ratings and some details about the rated stories:
+
+            [
+                {
+                    "id":2,
+                    "user":321,
+                    "score":4,
+                    "story":
+                    {
+                        "id":1,
+                        "title":"Test Story",
+                        "featured":false,
+                        "summary":"asdasdasd asdasd asd",
+                        "video_id":null,
+                        "audio_link":null,
+                        "tags":null,
+                        "org":1,
+                        "images":[],
+                        "created_on":"2023-01-30T13:56:31.493752+02:00"
+                    }
+                }
+            ]
         """
+
         queryset = self.model.objects.filter(user_id=user_id)
         filtered_queryset = self.filter_queryset(queryset)
         serializer = StoryRatingDetailedSerializer(filtered_queryset, many=True)
@@ -344,8 +410,42 @@ class StoryRatingViewSet(ModelViewSet):
     @action(detail=False, methods=['post'], url_path=USER_API_PATH)
     def set_user_rating(self, request, user_id):
         """
-        Create or update a rating given by the specified user
+        Create or update a story rating given by the specified user
+
+        
+        Example:
+        
+            POST /api/v1/storyratings/user/321/
+
+        Data:
+
+            {
+                "story": 1,
+                "score":5
+            }
+
+        Result will contain the rating and some details about the rated story:
+
+            {
+                "id":2,
+                "user":321,
+                "score":4,
+                "story":
+                {
+                    "id":1,
+                    "title":"Test Story",
+                    "featured":false,
+                    "summary":"asdasdasd asdasd asd",
+                    "video_id":null,
+                    "audio_link":null,
+                    "tags":null,
+                    "org":1,
+                    "images":[],
+                    "created_on":"2023-01-30T13:56:31.493752+02:00"
+                }
+            }
         """
+
         data = {
             'user': user_id,
             'story': request.data.get("story"),
@@ -405,6 +505,38 @@ class StoryReadActionViewSet(ModelViewSet):
     def retrieve_user_reads(self, request, user_id):
         """
         Get the story reads by the specified user
+
+        
+        
+        Example:
+
+            GET /api/v1/storyreads/user/321/
+
+        Data:
+
+            -
+
+        Result will contain the read stories and some details about them:
+
+            [
+                {
+                    "id":1,
+                    "user":321,
+                    "story":
+                    {
+                        "id":1,
+                        "title":"Test Story",
+                        "featured":false,
+                        "summary":"asdasdasd asdasd asd",
+                        "video_id":null,
+                        "audio_link":null,
+                        "tags":null,
+                        "org":1,
+                        "images":[],
+                        "created_on":"2023-01-30T13:56:31.493752+02:00"
+                    }
+                }
+            ]
         """
         
         queryset = self.model.objects.filter(user_id=user_id)
@@ -416,6 +548,36 @@ class StoryReadActionViewSet(ModelViewSet):
     def set_user_read(self, request, user_id):
         """
         Mark a story as read by the specified user and return a list of earned badges (if any)
+
+        
+        Example:
+
+            POST /api/v1/storyreads/user/321/
+
+        Data:
+
+            {
+                "story": 1
+            }
+
+        Result will contain a list of newly earned badges:
+
+            [
+                {
+                    "id":1,
+                    "badge_type":
+                    {
+                        "id":1,
+                        "org":1,
+                        "title":"First badge",
+                        "image":"https://example.com/media/userbadges/icon.png",
+                        "description":"You read your first story from this category!",
+                        "item_category":1
+                    },
+                    "user":321,
+                    "offered_on":"2023-03-07T20:56:53.198494+02:00"
+                }
+            ]
         """
         
         data = {
@@ -486,7 +648,39 @@ class StoryRewardViewSet(ModelViewSet):
     @action(detail=False, methods=['get'], url_path=USER_API_PATH)
     def retrieve_user_rewards(self, request, user_id):
         """
-        Get the rewards received by the specified user
+        Get the rewards received by the specified user for reading 
+        
+        
+        Example:
+
+            GET /api/v1/storyrewards/user/321/
+
+        Data:
+
+            -
+
+        Result will contain the rewards and some details about the read stories:
+
+            [
+                {
+                    "id":1,
+                    "user":321,
+                    "points":100,
+                    "story":
+                    {
+                        "id":1,
+                        "title":"Test Story",
+                        "featured":false,
+                        "summary":"asdasdasd asdasd asd",
+                        "video_id":null,
+                        "audio_link":null,
+                        "tags":null,
+                        "org":1,
+                        "images":[],
+                        "created_on":"2023-01-30T13:56:31.493752+02:00"
+                    }
+                }
+            ]
         """
         
         queryset = self.model.objects.filter(user_id=user_id)

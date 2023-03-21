@@ -35,6 +35,7 @@ class CustomAuthToken(ObtainAuthToken):
         """
         Get the authentication token
 
+
         Example:
             
             POST /api/v1/get-auth-token/
@@ -49,6 +50,7 @@ class CustomAuthToken(ObtainAuthToken):
         Response:
 
             {
+                "id":9,
                 "token":"12345678901234567890"
             }
         """
@@ -95,7 +97,8 @@ class UserProfileViewSet(GenericViewSet):
 
     def partial_update(self, request, user_id):
         """
-        Update the user's full name
+        Update the User full name
+
 
         Example:
             
@@ -107,7 +110,7 @@ class UserProfileViewSet(GenericViewSet):
                 "full_name":"John Doe" 
             }
 
-        Response:
+        Response will contain both the User and UserProfile as a flat dict:
 
             {
                 "id":9,
@@ -138,13 +141,29 @@ class UserProfileViewSet(GenericViewSet):
     @decorators.action(detail=False, methods=('put',))
     def update_image(self, request, user_id):
         """
-        Update the profile image
+        Update the User profile image
 
-        curl -X PUT "http://example.com/api/v1/userprofiles/user/4/image/" \\
-            -H  "Content-Type: multipart/form-data" \\
-            -H "accept: application/json" \\
-            -H "Authorization: Token XXXXXXXXXXX" \\
-            -F "image=@/the/path/image.png;type=image/png"
+
+        Example:
+
+            curl -X PUT "http://example.com/api/v1/userprofiles/user/4/image/" \\
+                -H  "Content-Type: multipart/form-data" \\
+                -H "accept: application/json" \\
+                -H "Authorization: Token XXXXXXXXXXX" \\
+                -F "image=@/the/path/image.png;type=image/png"
+
+        Response will contain both the User and UserProfile as a flat dict:
+
+            {
+                "id":9,
+                "username":"testemail2@EXAMPLE.COM",
+                "email":"testemail2@EXAMPLE.COM",
+                "first_name":"John",
+                "last_name":"Doe",
+                "full_name":"John Doe",
+                "rapidpro_uuid":"",
+                "image":"/path/image.png"
+            }
         """
         try:
             user = self.get_queryset().get(pk=user_id)
@@ -164,6 +183,65 @@ class UserProfileViewSet(GenericViewSet):
 
     @decorators.action(detail=False, methods=('post',))
     def reset_password(self, request):
+        """
+        Reset an User account password in three steps
+
+
+        Example for Step 1/3 -- Generate the confirmation code which will be sent by email:
+
+            POST /api/v1/userprofiles/forgot/
+
+        Data:
+        
+            {
+                "email":"string"
+            }
+
+        Result: 
+        
+            {
+                "detail":"OK"
+            }
+
+
+        Example for Step 2/3 -- Validate the confirmation code you received by email:
+
+            POST /api/v1/userprofiles/forgot/check/
+
+        Data:
+        
+            {
+                "email":"string",
+                "code":"string"
+            }
+
+        Result: 
+        
+            {
+                "detail":"OK"
+            }
+
+
+        Example for Step 3/3 -- Set the new password:
+
+            POST /api/v1/userprofiles/forgot/password/
+
+        Data:
+
+            {
+                "email":"string",
+                "code":"string",
+                "new_password":"string",
+                "new_password2":"string"
+            }
+        
+        Result:
+        
+            {
+                "detail":"OK"
+            }
+        """
+
         serializer = ResetPasswordSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -173,6 +251,31 @@ class UserProfileViewSet(GenericViewSet):
 
     @decorators.action(detail=False, methods=('post',))
     def create_user(self, request):
+        """
+        Sign up for an User account
+
+
+        Example:
+            
+            POST /api/v1/userprofiles/signup/
+
+        Data:
+
+            {
+                "full_name":"string",
+                "email":"string",
+                "password":"string",
+                "rapidpro_uuid":"string"
+            }
+
+        Response:
+            
+            {
+                "id":10,
+                "token":"12345678901234567890"
+            }
+        """
+
         serializer = CreateUserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -186,6 +289,29 @@ class UserProfileViewSet(GenericViewSet):
 
     @decorators.action(detail=False, methods=('post',), url_path=USER_API_PATH)
     def change_password(self, request, user_id):
+        """
+        Update an User account's password
+
+
+        Example:
+            
+            POST /api/v1/userprofiles/user/321/password/
+
+        Data:
+
+            {
+                "current_password":"string", 
+                "new_password":"string",
+                "new_password2":"string"
+            }
+
+        Response will contain the operation status:
+            
+            {
+                "detail":"OK"
+            }
+        """
+
         try:
             user = self.get_queryset().get(pk=user_id)
         except User.DoesNotExist:
@@ -205,11 +331,12 @@ class UserProfileViewSet(GenericViewSet):
         """
         Retrieve the current User and their UserProfile
 
+
         Example:
             
             GET /api/v1/userprofiles/user/@me/
 
-        Response will contain both the User and UserProfile as a flat dict
+        Response will contain both the User and UserProfile as a flat dict:
 
             {
                 "id": 3,
@@ -220,6 +347,7 @@ class UserProfileViewSet(GenericViewSet):
                 "rapidpro_uuid": "string",
                 "image": "string" | null
             }
+
         """
         user_id = request.user.id
         try:
@@ -234,11 +362,12 @@ class UserProfileViewSet(GenericViewSet):
         """
         Retrieve the User and their UserProfile
 
+
         Example:
             
             GET /api/v1/userprofiles/user/3/
 
-        Response will contain both the User and UserProfile as a flat dict
+        Response will contain both the User and UserProfile as a flat dict:
 
             {
                 "id": 3,
@@ -264,11 +393,12 @@ class UserProfileViewSet(GenericViewSet):
         """
         Delete the User and their UserProfile
 
+
         Example:
             
             DELETE /api/v1/userprofiles/user/3/
 
-        Response will contain the operation status
+        Response will contain the operation status:
 
             {
                 "detail": "OK"
