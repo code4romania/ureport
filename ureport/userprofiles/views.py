@@ -1,16 +1,17 @@
 from django.contrib.auth.models import User
+from django.contrib.auth.signals import user_logged_in
 from django.http import Http404
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
-from django.views.decorators.vary import vary_on_cookie, vary_on_headers
+from django.views.decorators.vary import vary_on_headers
 from rest_framework import decorators
 from rest_framework import status
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.viewsets import GenericViewSet
 
 from ureport.apiextras.views import (
     IsOwnerUserOrAdmin,
@@ -54,11 +55,14 @@ class CustomAuthToken(ObtainAuthToken):
                 "token":"12345678901234567890"
             }
         """
+
         serializer = self.serializer_class(
             data=request.data, context={'request': request})
+            
         if serializer.is_valid():
             user = serializer.validated_data.get('user')
             token, created = Token.objects.get_or_create(user=user)
+            user_logged_in.send(sender=user.__class__, request=request, user=user)
             return Response({
                 "id": user.pk,
                 "token": token.key,
