@@ -143,6 +143,7 @@ class StoryReadSerializer(serializers.ModelSerializer):
             "images",
             "category",
             "created_on",
+            "written_by",
         )
 
 
@@ -160,6 +161,7 @@ class StoryShortReadSerializer(StoryReadSerializer):
             "org",
             "images",
             "created_on",
+            "written_by",
         )
 
 
