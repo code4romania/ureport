@@ -34,7 +34,7 @@ from ureport.storyextras.serializers import (
     StoryRewardDetailedSerializer,
     StorySettingsSerializer,
 )
-from ureport.userbadges.models import create_badge_for_story
+from ureport.userbadges.models import UserBadge, create_badge_for_story
 from ureport.userbadges.serializers import UserBadgeSerializer
 
 
@@ -617,6 +617,47 @@ class StoryReadActionViewSet(ModelViewSet):
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK
         )
 
+    @action(detail=False, methods=['delete'], url_path=USER_API_PATH)
+    def reset_user_reads(self, request, user_id):
+        """
+        Delete the read story stats including received badges and rewards
+        
+        
+        Example:
+
+            DELETE /api/v1/storyreads/user/321/
+
+        Data:
+
+            -
+
+        Result will contain the number of deleted items:
+
+            {
+                "read_count":12,
+                "reward_count":7,
+                "badge_count":3,
+            }
+        """
+                
+        read_count = StoryRead.objects.filter(
+            user_id=user_id
+        ).delete()
+
+        reward_count = StoryReward.objects.filter(
+            user_id=user_id
+        ).delete()
+
+        badge_count = UserBadge.objects.filter(
+            user_id=user_id
+        ).delete()
+
+        return Response({
+            "read_count": read_count[0],
+            "reward_count": reward_count[0],
+            "badge_count": badge_count[0],
+        })
+
 
 class StoryRewardViewSet(ModelViewSet):
     """
@@ -648,7 +689,7 @@ class StoryRewardViewSet(ModelViewSet):
     @action(detail=False, methods=['get'], url_path=USER_API_PATH)
     def retrieve_user_rewards(self, request, user_id):
         """
-        Get the rewards received by the specified user for reading 
+        Get the rewards received by the specified user for reading stories
         
         
         Example:
@@ -687,3 +728,4 @@ class StoryRewardViewSet(ModelViewSet):
         filtered_queryset = self.filter_queryset(queryset)
         serializer = StoryRewardDetailedSerializer(filtered_queryset, many=True)
         return Response(serializer.data)
+

@@ -159,6 +159,7 @@ urlpatterns = [
         r"^storyreads/user/(?P<user_id>[\d]+)/$",
         StoryReadActionViewSet.as_view({
             "get": "retrieve_user_reads",
+            "delete": "reset_user_reads",
             "post": "set_user_read",
         }), 
         name="api.v1.storyreads_for_user"
