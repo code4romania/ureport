@@ -149,7 +149,6 @@ class StorySettingsViewSet(ModelViewSet):
         return Response(serializer.data)
 
 
-
 class StoryBookmarkViewSet(ModelViewSet):
     """
     This endpoint allows you to manage the story bookmarks.
@@ -242,7 +241,8 @@ class StoryBookmarkViewSet(ModelViewSet):
 
         queryset = self.model.objects.filter(user_id=user_id)
         filtered_queryset = self.filter_queryset(queryset)
-        serializer = StoryBookmarkDetailedSerializer(filtered_queryset, many=True)
+        context = {"request": request}
+        serializer = StoryBookmarkDetailedSerializer(filtered_queryset, many=True, context=context)
         return Response(serializer.data)
 
     @action(detail=False, methods=['delete'], url_path=USER_API_PATH)
@@ -314,7 +314,8 @@ class StoryBookmarkViewSet(ModelViewSet):
             'user': user_id,
         }
         serializer = StoryBookmarkSerializer(data=data)
-
+        context = {"request": request}
+        
         try:
             bookmark = StoryBookmark.objects.get(
                 user=data["user"],
@@ -332,7 +333,7 @@ class StoryBookmarkViewSet(ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         return Response(
-            StoryBookmarkDetailedSerializer(bookmark).data, 
+            StoryBookmarkDetailedSerializer(bookmark, context=context).data, 
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK
         )
 
@@ -404,7 +405,8 @@ class StoryRatingViewSet(ModelViewSet):
 
         queryset = self.model.objects.filter(user_id=user_id)
         filtered_queryset = self.filter_queryset(queryset)
-        serializer = StoryRatingDetailedSerializer(filtered_queryset, many=True)
+        context = {"request": request}
+        serializer = StoryRatingDetailedSerializer(filtered_queryset, many=True, context=context)
         return Response(serializer.data)
     
     @action(detail=False, methods=['post'], url_path=USER_API_PATH)
@@ -451,6 +453,7 @@ class StoryRatingViewSet(ModelViewSet):
             'story': request.data.get("story"),
             'score': request.data.get("score"),
         }
+        context = {"request": request}
 
         try:
             rating = StoryRating.objects.get(
@@ -469,7 +472,7 @@ class StoryRatingViewSet(ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(
-            StoryRatingDetailedSerializer(rating).data, 
+            StoryRatingDetailedSerializer(rating, context=context).data, 
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK
         )
 
@@ -541,7 +544,8 @@ class StoryReadActionViewSet(ModelViewSet):
         
         queryset = self.model.objects.filter(user_id=user_id)
         filtered_queryset = self.filter_queryset(queryset)
-        serializer = StoryReadActionDetailedSerializer(filtered_queryset, many=True)
+        context = {"request": request}
+        serializer = StoryReadActionDetailedSerializer(filtered_queryset, context=context, many=True)
         return Response(serializer.data)
     
     @action(detail=False, methods=['post'], url_path=USER_API_PATH)
@@ -726,6 +730,7 @@ class StoryRewardViewSet(ModelViewSet):
         
         queryset = self.model.objects.filter(user_id=user_id)
         filtered_queryset = self.filter_queryset(queryset)
-        serializer = StoryRewardDetailedSerializer(filtered_queryset, many=True)
+        context = {"request": request}
+        serializer = StoryRewardDetailedSerializer(filtered_queryset, context=context, many=True)
         return Response(serializer.data)
 
