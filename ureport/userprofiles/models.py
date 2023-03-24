@@ -66,7 +66,7 @@ class UserProfile(models.Model):
         verbose_name_plural = _("Use profiles")
 
     def generate_reset_code(self):
-        self.password_reset_code = "{}".format(randint(1000, 9999))
+        self.password_reset_code = "{}".format(randint(100000, 999999))
         self.password_reset_retries = 0
         self.password_reset_expiry = timezone.now() + timedelta(hours=6)
         self.save()
