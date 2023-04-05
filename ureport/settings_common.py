@@ -1082,6 +1082,7 @@ CELERY_BEAT_SCHEDULE = {
 UREPORT_DEFAULT_PRIMARY_COLOR = "#FFD100"
 UREPORT_DEFAULT_SECONDARY_COLOR = "#1F49BF"
 
+SUBCATEGORY_SEPARATOR = "/"  # Example: "Parent Category / Subcategory" (only one level deep)
 
 # -----------------------------------------------------------------------------------
 # non org urls

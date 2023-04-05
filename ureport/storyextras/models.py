@@ -1,5 +1,8 @@
-from dash.stories.models import Story
+from typing import Optional, List
+
+from dash.stories.models import Story, Category
 from django.contrib.auth.models import User
+from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, IntegrityError
 from django.db.models.signals import post_save
@@ -114,3 +117,49 @@ class StoryReward(StoryUserModel):
 def calculate_story_rating(sender, **kwargs):
     # TODO
     print("Someone rated a story...")
+
+
+class CategoryExtras:
+    
+    @staticmethod
+    def get_parent_category(subcategory: Category) -> Optional[Category]:
+        """
+        Returns the top-level parent category ID 
+
+        Example: 
+
+            For "Category One / Subcategory 123 / Abcdef" it will try to
+            retrieve "Category One"
+        """
+
+        sep = settings.SUBCATEGORY_SEPARATOR
+
+        if not subcategory or not sep in subcategory.name:
+            return None
+
+        parent_name = subcategory.name.split(sep)[0].strip()
+        try:
+            parent_category = Category.objects.get(name=parent_name)
+        except Category.DoesNotExist:
+            return None
+        else:
+            return parent_category
+        
+    @staticmethod
+    def get_subcategory_ids(category: Category) -> List[Category]:
+        """
+        Returns the list of subcategory IDs, 
+        but only if the provided category is not a subcategory too
+        """
+        
+        sep = settings.SUBCATEGORY_SEPARATOR
+
+        if not category or sep in category.name:
+            return []
+
+        subcategory_name_start = "{} {}".format(category.name, sep)
+        return list(
+            Category.objects.filter(
+                name__startswith=subcategory_name_start
+            ).values_list('pk', flat=True)
+        )

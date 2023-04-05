@@ -28,19 +28,20 @@ class BadgeTypeCRUDL(SmartCRUDL):
     class Update(OrgObjPermsMixin, SmartUpdateView):
         form_class = BadgeTypeForm
         fields = (
-            "title", "image", "description", "is_visible", 
-            "item_type", "item_category", "item_count",
+            "title", "image",
+            "is_active", "validation_category", "validation_total",
+            "unfinished_template", "finished_description",
         )
 
     class Create(OrgPermsMixin, SmartCreateView):
         form_class = BadgeTypeForm
         fields = (
-            "org", "title", "image", "description", "item_type",
+            "org", "title", "image",
         )
 
     class List(OrgPermsMixin, SmartListView):
         fields = (
-            "org", "title", "item_type", "is_visible", 
+            "org", "title", "is_active", "validation_category", "validation_total",
         )
         ordering = ("org__name", "title")
 
@@ -102,7 +103,8 @@ class UserBadgeViewSet(ModelViewSet):
                         "title":"First badge",
                         "image":"https://example.com/media/userbadges/icon.png",
                         "description":"You read your first story from this category!",
-                        "item_category":1
+                        "validation_category":1,
+                        "item_category":1,  # Deprecated
                     },
                     "user":321,
                     "offered_on":"2023-03-07T20:56:53.198494+02:00"

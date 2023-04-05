@@ -34,7 +34,7 @@ from ureport.storyextras.serializers import (
     StoryRewardDetailedSerializer,
     StorySettingsSerializer,
 )
-from ureport.userbadges.models import UserBadge, create_badge_for_story
+from ureport.userbadges.models import UserBadge
 from ureport.userbadges.serializers import UserBadgeSerializer
 
 
@@ -605,14 +605,8 @@ class StoryReadActionViewSet(ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # Count how many stories the user has read
-        total_reads = StoryRead.objects.filter(
-            user=read.user, story__org=read.story.org).count()
-        category_reads = StoryRead.objects.filter(
-            user=read.user, story__category=read.story.category).count()
-
-        new_badges = create_badge_for_story(
-            read.user, read.story.org, read.story.category, total_reads, category_reads)
+        new_badges = UserBadge.create_badges_after_story(
+            read.user, read.story.org, read.story.category)
 
         # show the new badges
         badges_serializer = UserBadgeSerializer(new_badges, many=True)
