@@ -948,23 +948,10 @@ ANONYMOUS_USER_NAME = "AnonymousUser"
 # -----------------------------------------------------------------------------------
 # Social-auth Configuration
 # -----------------------------------------------------------------------------------
-SOCIAL_AUTH_FACEBOOK_KEY = ""
-SOCIAL_AUTH_FACEBOOK_SECRET = ""
-SOCIAL_AUTH_FACEBOOK_API_VERSION = '2.9'
-SOCIAL_AUTH_FACEBOOK_SCOPE = ["email"]
-SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
-  "locale": "en_US",
-  "fields": "id, name, email"
-}
-
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = ""
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = ""
-SOCIAL_AUTH_GOOGLE_OAUTH2_IGNORE_DEFAULT_SCOPE = True
-SOCIAL_AUTH_FACEBOOK_SCOPE = [
-    "https://www.googleapis.com/auth/userinfo.email",
-    "https://www.googleapis.com/auth/userinfo.profile",
-]
-
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
+SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = False
+SOCIAL_AUTH_CLEAN_USERNAMES = True
+SOCIAL_AUTH_CLEAN_USERNAME_FUNCTION = "ureport.userprofiles.models.clean_social_username"
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
     'social_core.pipeline.social_auth.social_uid',
@@ -975,6 +962,30 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
 )
+
+# Facebook Login:
+SOCIAL_AUTH_FACEBOOK_KEY = os.getenv("SOCIAL_FACEBOOK_APPID", "")
+SOCIAL_AUTH_FACEBOOK_SECRET = os.getenv("SOCIAL_FACEBOOK_SECRET", "")
+SOCIAL_AUTH_FACEBOOK_API_VERSION = '2.9'
+SOCIAL_AUTH_FACEBOOK_SCOPE = [
+    "email",
+    "first_name",
+    "last_name",
+]
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+  "locale": "en_US",
+  "fields": "id, name, email",
+}
+
+# Google Login:
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("SOCIAL_GOOGLE_APPID", "")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("SOCIAL_GOOGLE_SECRET", "")
+SOCIAL_AUTH_GOOGLE_OAUTH2_IGNORE_DEFAULT_SCOPE = True
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    "openid",
+    "https://www.googleapis.com/auth/userinfo.profile",
+    "https://www.googleapis.com/auth/userinfo.email",
+]
 
 # -----------------------------------------------------------------------------------
 # Redis Configuration

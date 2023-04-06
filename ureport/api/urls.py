@@ -34,7 +34,7 @@ from ureport.storyextras.views import (
     StorySettingsViewSet,
 )
 from ureport.userbadges.views import UserBadgeViewSet
-from ureport.userprofiles.views import CustomAuthToken, UserProfileViewSet
+from ureport.userprofiles.views import CustomAuthToken, UserProfileViewSet, social_registration
 
 
 schema_view = get_swagger_view(title="API")
@@ -60,6 +60,8 @@ urlpatterns = [
     re_path(r"^stories/(?P<pk>[\d]+)/$", StoryDetails.as_view(), name="api.v1.story_details"),
     
     # Authentication
+    re_path(r"^get-auth-token/facebook/$", social_registration, {"backend": "facebook-oauth2"}),
+    re_path(r"^get-auth-token/google/$", social_registration, {"backend": "google-oauth2"}),
     re_path(r"^get-auth-token/", CustomAuthToken.as_view()),
 
     # Swagger UI for documentation

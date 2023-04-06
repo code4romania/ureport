@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in
-from django.http import Http404
+from django.http import Http404, HttpResponse, HttpRequest
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
@@ -9,9 +9,11 @@ from rest_framework import decorators
 from rest_framework import status
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from social_django.utils import psa
 
 from ureport.apiextras.views import (
     IsOwnerUserOrAdmin,
@@ -30,6 +32,15 @@ from ureport.userprofiles.serializers import (
 
 
 class CustomAuthToken(ObtainAuthToken):
+
+    @staticmethod
+    def perform_user_login(request: HttpRequest, user: User) -> HttpResponse:
+        token, created = Token.objects.get_or_create(user=user)
+        user_logged_in.send(sender=user.__class__, request=request, user=user)
+        return Response({
+            "id": user.pk,
+            "token": token.key,
+        })
 
     @method_decorator(never_cache)
     def post(self, request, *args, **kwargs):
@@ -61,14 +72,39 @@ class CustomAuthToken(ObtainAuthToken):
             
         if serializer.is_valid():
             user = serializer.validated_data.get('user')
-            token, created = Token.objects.get_or_create(user=user)
-            user_logged_in.send(sender=user.__class__, request=request, user=user)
-            return Response({
-                "id": user.pk,
-                "token": token.key,
-            })
+            return CustomAuthToken.perform_user_login(request, user)
         else:
             return SerializerErrorResponse(serializer.errors)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@psa()  # Add the backend object to the request
+def social_registration(request: HttpRequest, backend: str) -> HttpResponse:
+    """
+    Handle OAuth authentication from Google, Facebook, ...
+
+    Data:
+
+        {
+            "access_token":"string", 
+        }
+
+    Response:
+
+        {
+            "id":9,
+            "token":"12345678901234567890"
+        }
+    """
+    
+    oauth_token = request.data.get('access_token')
+    user = request.backend.do_auth(oauth_token)
+    
+    if user:
+        return CustomAuthToken.perform_user_login(request, user)
+    else:
+        return SerializerErrorResponse(_("Invalid OAuth token"))
 
 
 class UserProfileViewSet(GenericViewSet):
@@ -351,6 +387,8 @@ class UserProfileViewSet(GenericViewSet):
                 "rapidpro_uuid": "string",
                 "image": "string" | null
             }
+
+        The rapidpro_uuid field will be blank as it is currently not used.
 
         """
         user_id = request.user.id

@@ -19,11 +19,17 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class UserWithProfileReadSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer(source='userprofile', read_only=True)
+    social_auth = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ("id", "username", "email", "first_name", "last_name", "profile")
+        fields = ("id", "social_auth", "username", "email", "first_name", "last_name", "profile")
         read_only_fields = fields
+
+    def get_social_auth(self, user):
+        if not user.userprofile:
+            return False
+        return user.userprofile.is_social_auth()
 
     def to_representation(self, instance):
         """

@@ -1,6 +1,7 @@
 from datetime import timedelta
-from random import randint
 from functools import partial
+from random import randint
+from uuid import uuid4
 
 from dash.utils import generate_file_path
 from django.db import models, IntegrityError
@@ -12,6 +13,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.authtoken.models import Token
+from social_django.models import UserSocialAuth
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -86,6 +88,15 @@ class UserProfile(models.Model):
     def full_name(self):
         return "{} {}".format(self.user.first_name, self.user.last_name)
 
+    def is_social_auth(self) -> bool:
+        """
+        Check if the user also has a social auth profile
+        """
+        if UserSocialAuth.objects.filter(user=self.user).count():
+            return True
+        else:
+            return False
+
 
 @receiver(post_save, sender=User)
 def auto_create_user_profile(sender, instance, **kwargs):
@@ -94,3 +105,7 @@ def auto_create_user_profile(sender, instance, **kwargs):
             UserProfile.objects.create(user=instance)
         except IntegrityError:
             pass
+
+
+def clean_social_username(original_username: str) -> str:
+    return str(uuid4().hex)
