@@ -42,7 +42,7 @@ class IsOwnerUserOrAdmin(IsAuthenticated):
 class SerializerErrorResponse(Response):
 
     def __init__(self, data=""):
-        if type(data) in (str, type(_(""))):
+        if type(data) in (str, type(_("text"))):
             output = {
                 "detail": data,
             }
