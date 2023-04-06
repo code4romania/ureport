@@ -41,6 +41,7 @@ iso8601 = "^0.1.12"
 sorl-thumbnail = "^12.7.0"
 stop_words = "^2018.7.23"
 celery = {extras = ["redis"], version = ">4.4.6"}
+social-auth-app-django = "^5.2.0"
 
 
 [tool.poetry.dev-dependencies]
