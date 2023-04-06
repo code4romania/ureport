@@ -1,4 +1,5 @@
 from dash.orgs.views import OrgPermsMixin, OrgObjPermsMixin
+from django.http import HttpRequest, HttpResponse
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -82,7 +83,7 @@ class UserBadgeViewSet(ModelViewSet):
         return queryset
 
     @action(detail=False, methods=['get'], url_path=USER_API_PATH)
-    def retrieve_user_badges(self, request, user_id):
+    def retrieve_user_badges(self, request: HttpRequest, user_id: int) -> HttpResponse:
         """
         Get the user badges belonging to the specified user (optionally filtered by Org)
 

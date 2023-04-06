@@ -26,7 +26,7 @@ class UserWithProfileReadSerializer(serializers.ModelSerializer):
         fields = ("id", "social_auth", "username", "email", "first_name", "last_name", "profile")
         read_only_fields = fields
 
-    def get_social_auth(self, user):
+    def get_social_auth(self, user: User) -> bool:
         if not user.userprofile:
             return False
         return user.userprofile.is_social_auth()
@@ -68,7 +68,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
         model = User
         fields = ("full_name", "email", "password", "rapidpro_uuid")
 
-    def validate_email(self, value):
+    def validate_email(self, value: str) -> str:
         clean_email = value.strip()        
         if len(clean_email.split("@")) != 2:
             raise serializers.ValidationError(_("Wrong email format"))
@@ -79,7 +79,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
         else:
             return clean_email
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict) -> User:
         split_name = validated_data.get("full_name","").split(" ")
         
         first_name = split_name[0]
@@ -108,13 +108,13 @@ class ResetPasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(max_length=128, required=False)
     new_password2 = serializers.CharField(max_length=128, required=False)
 
-    def validate_email(self, value):
+    def validate_email(self, value: str) -> str:
         clean_email = value.strip()        
         if len(clean_email.split("@")) != 2:
             raise serializers.ValidationError(_("Wrong email format"))
         return clean_email
     
-    def validate(self, data):
+    def validate(self, data: dict) -> dict:
         try:
             self.instance = User.objects.get(username__iexact=data.get("email"))
         except User.DoesNotExist:
@@ -128,7 +128,7 @@ class ResetPasswordSerializer(serializers.Serializer):
 
         return data
 
-    def save(self):
+    def save(self) -> User:
         if self.validated_data.get("code"):
             # We have a validated code
             if self.validated_data.get("new_password"):
@@ -159,7 +159,7 @@ class ChangePasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(max_length=128)
     new_password2 = serializers.CharField(max_length=128)
 
-    def validate(self, data):
+    def validate(self, data: dict) -> dict:
         if not self.instance:
             raise serializers.ValidationError(_("User does not exist"))
         
@@ -171,7 +171,7 @@ class ChangePasswordSerializer(serializers.Serializer):
         
         return data
 
-    def save(self):
+    def save(self) -> User:
         self.instance.set_password(self.validated_data["new_password"])
         self.instance.save()
         return self.instance

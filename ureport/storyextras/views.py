@@ -1,5 +1,5 @@
 # from django import forms
-from django.http import Http404
+from django.http import Http404, HttpRequest, HttpResponse
 # from dash.categories.fields import CategoryChoiceField
 # from dash.orgs.views import OrgObjPermsMixin
 # from dash.stories.views import StoryCRUDL, StoryForm
@@ -122,7 +122,7 @@ class StorySettingsViewSet(ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     @action(detail=True, methods=['get'], url_path=STORY_API_PATH)
-    def retrieve_settings(self, request, story_id):
+    def retrieve_settings(self, request: HttpRequest, story_id: int) -> HttpResponse:
         """
         Retrieve the settings for the specified story
 
@@ -204,7 +204,7 @@ class StoryBookmarkViewSet(ModelViewSet):
         return queryset
 
     @action(detail=False, methods=['get'], url_path=USER_API_PATH)
-    def retrieve_user_bookmarks(self, request, user_id):
+    def retrieve_user_bookmarks(self, request: HttpRequest, user_id: int) -> HttpResponse:
         """
         Retrieve the bookmarks set by the specified user
 
@@ -246,7 +246,7 @@ class StoryBookmarkViewSet(ModelViewSet):
         return Response(serializer.data)
 
     @action(detail=False, methods=['delete'], url_path=USER_API_PATH)
-    def remove_user_bookmarks(self, request, user_id):
+    def remove_user_bookmarks(self, request: HttpRequest, user_id: int) -> HttpResponse:
         """
         Remove any bookmarks set by the specified user
 
@@ -275,7 +275,7 @@ class StoryBookmarkViewSet(ModelViewSet):
         return Response({"count": count[0]})
 
     @action(detail=False, methods=['post'], url_path=USER_API_PATH)
-    def create_user_bookmark(self, request, user_id):
+    def create_user_bookmark(self, request: HttpRequest, user_id: int) -> HttpResponse:
         """
         Bookmark a story for the specified user
 
@@ -366,7 +366,7 @@ class StoryRatingViewSet(ModelViewSet):
         return queryset
 
     @action(detail=False, methods=['get'], url_path=USER_API_PATH)
-    def retrieve_user_ratings(self, request, user_id):
+    def retrieve_user_ratings(self, request: HttpRequest, user_id: int) -> HttpResponse:
         """
         Get the ratings given by the specified user (optionally filtered by Story)
 
@@ -410,7 +410,7 @@ class StoryRatingViewSet(ModelViewSet):
         return Response(serializer.data)
     
     @action(detail=False, methods=['post'], url_path=USER_API_PATH)
-    def set_user_rating(self, request, user_id):
+    def set_user_rating(self, request: HttpRequest, user_id: int) -> HttpResponse:
         """
         Create or update a story rating given by the specified user
 
@@ -505,7 +505,7 @@ class StoryReadActionViewSet(ModelViewSet):
         return queryset
 
     @action(detail=False, methods=['get'], url_path=USER_API_PATH)
-    def retrieve_user_reads(self, request, user_id):
+    def retrieve_user_reads(self, request: HttpRequest, user_id: int) -> HttpResponse:
         """
         Get the story reads by the specified user
 
@@ -549,7 +549,7 @@ class StoryReadActionViewSet(ModelViewSet):
         return Response(serializer.data)
     
     @action(detail=False, methods=['post'], url_path=USER_API_PATH)
-    def set_user_read(self, request, user_id):
+    def set_user_read(self, request: HttpRequest, user_id: int) -> HttpResponse:
         """
         Mark a story as read by the specified user and return a list of earned badges (if any)
 
@@ -616,7 +616,7 @@ class StoryReadActionViewSet(ModelViewSet):
         )
 
     @action(detail=False, methods=['delete'], url_path=USER_API_PATH)
-    def reset_user_reads(self, request, user_id):
+    def reset_user_reads(self, request: HttpRequest, user_id: int) -> HttpResponse:
         """
         Delete the read story stats including received badges and rewards
         
@@ -685,7 +685,7 @@ class StoryRewardViewSet(ModelViewSet):
         return queryset
 
     @action(detail=False, methods=['get'], url_path=USER_API_PATH)
-    def retrieve_user_rewards(self, request, user_id):
+    def retrieve_user_rewards(self, request: HttpRequest, user_id: int) -> HttpResponse:
         """
         Get the rewards received by the specified user for reading stories
         

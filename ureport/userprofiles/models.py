@@ -67,17 +67,17 @@ class UserProfile(models.Model):
         verbose_name = _("User profile")
         verbose_name_plural = _("Use profiles")
 
-    def generate_reset_code(self):
+    def generate_reset_code(self) -> None:
         self.password_reset_code = "{}".format(randint(100000, 999999))
         self.password_reset_retries = 0
         self.password_reset_expiry = timezone.now() + timedelta(hours=6)
         self.save()
 
-    def increment_reset_retries(self):
+    def increment_reset_retries(self) -> None:
         self.password_reset_retries += 1
         self.save()
 
-    def validate_reset_code(self, input):
+    def validate_reset_code(self, input: str) -> bool:
         if timezone.now() > self.password_reset_expiry:
             return False
         if input != self.password_reset_code:
@@ -85,7 +85,7 @@ class UserProfile(models.Model):
         return True
 
     @property
-    def full_name(self):
+    def full_name(self) -> str:
         return "{} {}".format(self.user.first_name, self.user.last_name)
 
     def is_social_auth(self) -> bool:
@@ -99,7 +99,7 @@ class UserProfile(models.Model):
 
 
 @receiver(post_save, sender=User)
-def auto_create_user_profile(sender, instance, **kwargs):
+def auto_create_user_profile(sender, instance: User, **kwargs) -> None:
     if not UserProfile.objects.filter(user=instance).exists():
         try:
             UserProfile.objects.create(user=instance)

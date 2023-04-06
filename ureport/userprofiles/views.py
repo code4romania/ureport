@@ -43,7 +43,7 @@ class CustomAuthToken(ObtainAuthToken):
         })
 
     @method_decorator(never_cache)
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         """
         Get the authentication token
 
@@ -135,7 +135,7 @@ class UserProfileViewSet(GenericViewSet):
             return []
         return [IsOwnerUserOrAdmin()]
 
-    def partial_update(self, request, user_id):
+    def partial_update(self, request: HttpRequest, user_id: int) -> HttpResponse:
         """
         Update the User full name
 
@@ -179,7 +179,7 @@ class UserProfileViewSet(GenericViewSet):
             return SerializerErrorResponse(serializer.errors)
 
     @decorators.action(detail=False, methods=('put',))
-    def update_image(self, request, user_id):
+    def update_image(self, request: HttpRequest, user_id: int) -> HttpResponse:
         """
         Update the User profile image
 
@@ -222,7 +222,7 @@ class UserProfileViewSet(GenericViewSet):
         )
 
     @decorators.action(detail=False, methods=('post',))
-    def reset_password(self, request):
+    def reset_password(self, request: HttpRequest) -> HttpResponse:
         """
         Reset an User account password in three steps
 
@@ -290,7 +290,7 @@ class UserProfileViewSet(GenericViewSet):
             return SerializerErrorResponse(serializer.errors)
 
     @decorators.action(detail=False, methods=('post',))
-    def create_user(self, request):
+    def create_user(self, request: HttpRequest) -> HttpResponse:
         """
         Sign up for an User account
 
@@ -328,7 +328,7 @@ class UserProfileViewSet(GenericViewSet):
             return SerializerErrorResponse(serializer.errors)
 
     @decorators.action(detail=False, methods=('post',), url_path=USER_API_PATH)
-    def change_password(self, request, user_id):
+    def change_password(self, request: HttpRequest, user_id: int) -> HttpResponse:
         """
         Update an User account's password
 
@@ -367,7 +367,7 @@ class UserProfileViewSet(GenericViewSet):
 
     @decorators.action(detail=False, methods=('get',), url_path=CURRENT_USER_API_PATH)
     @method_decorator(vary_on_headers("Authorization",))
-    def retrieve_current_user_with_profile(self, request):
+    def retrieve_current_user_with_profile(self, request: HttpRequest) -> HttpResponse:
         """
         Retrieve the current User and their UserProfile
 
@@ -400,7 +400,7 @@ class UserProfileViewSet(GenericViewSet):
         return Response(serializer.data)
 
     @decorators.action(detail=False, methods=('get',), url_path=USER_API_PATH)
-    def retrieve_user_with_profile(self, request, user_id):
+    def retrieve_user_with_profile(self, request: HttpRequest, user_id: int) -> HttpResponse:
         """
         Retrieve the User and their UserProfile
 
@@ -431,7 +431,7 @@ class UserProfileViewSet(GenericViewSet):
         return Response(serializer.data)
 
     @decorators.action(detail=False, methods=('delete',), url_path=USER_API_PATH)
-    def delete_user(self, request, user_id):
+    def delete_user(self, request: HttpRequest, user_id: int) -> HttpResponse:
         """
         Delete the User and their UserProfile
 
