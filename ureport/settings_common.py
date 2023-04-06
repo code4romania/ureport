@@ -40,7 +40,9 @@ else:
 
 
 DEBUG = True
+
 THUMBNAIL_DEBUG = DEBUG
+THUMBNAIL_PRESERVE_FORMAT = True
 
 ADMINS = (("Nyaruka", "code@nyaruka.com"),)
 
