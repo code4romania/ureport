@@ -44,7 +44,7 @@ DEBUG = True
 THUMBNAIL_DEBUG = DEBUG
 THUMBNAIL_PRESERVE_FORMAT = True
 
-ADMINS = (("Nyaruka", "code@nyaruka.com"),)
+ADMINS = ()
 
 MANAGERS = ADMINS
 
@@ -63,8 +63,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # set the mail settings, we send throught gmail
 EMAIL_HOST = "smtp.gmail.com"
-EMAIL_HOST_USER = "server@nyaruka.com"
-DEFAULT_FROM_EMAIL = "server@nyaruka.com"
+EMAIL_HOST_USER = "server@localhost"
+DEFAULT_FROM_EMAIL = "server@localhost"
 EMAIL_HOST_PASSWORD = "NOTREAL"
 EMAIL_USE_TLS = True
 
