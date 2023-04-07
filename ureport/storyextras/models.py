@@ -113,12 +113,6 @@ class StoryReward(StoryUserModel):
         unique_together = ['story', 'user']
 
 
-@receiver(models.signals.post_save, sender=StoryRating)
-def calculate_story_rating(sender, **kwargs):
-    # TODO
-    print("Someone rated a story...")
-
-
 class CategoryExtras:
     
     @staticmethod
