@@ -35,7 +35,7 @@ msgstr "text"
 
 #: ureport/assets/models.py:17
 msgid "Banner"
-msgstr "Baner"
+msgstr "Banner"
 
 #: ureport/assets/models.py:18
 msgid "Pattern"
@@ -51,7 +51,7 @@ msgstr "Despre logo partener"
 
 #: ureport/assets/models.py:29 ureport/contacts/models.py:52
 msgid "Org"
-msgstr "Organizație"
+msgstr "Org"
 
 #: ureport/assets/models.py:31
 msgid "The organization to which the image will be used"
@@ -59,7 +59,7 @@ msgstr "Organizația pentru care va fi utilizată imaginea"
 
 #: ureport/assets/models.py:35
 msgid "Name"
-msgstr "Denumirea"
+msgstr "Denumiree"
 
 #: ureport/assets/models.py:35
 msgid "A short descriptive name for this image"
@@ -1147,7 +1147,7 @@ msgstr "Evaluare medie"
 
 #: ureport/storyextras/models.py:30
 msgid "Cached computed rating average"
-msgstr ""
+msgstr "Calcul evaluare medie memorat"
 
 #: ureport/storyextras/models.py:33 ureport/storyextras/models.py:34
 msgid "Story settings"
@@ -2105,10 +2105,10 @@ msgid "Import %s"
 msgstr "Importă %s"
 
 msgid "Back to Website"
-msgstr "Înapoi la website "
+msgstr "Înapoi la website"
 
 msgid "Welcome, "
-msgstr "Bine ai venit,"
+msgstr "Bine ai venit, "
 
 msgid "Logout"
 msgstr "Deconectare"
@@ -2142,7 +2142,7 @@ msgid "Reports"
 msgstr "Rapoarte"
 
 msgid "Category Images"
-msgstr "Imagini categorie"
+msgstr "Imagini categorii"
 
 msgid "+ New "
 msgstr "+ Nou "
