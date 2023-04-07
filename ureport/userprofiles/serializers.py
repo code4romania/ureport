@@ -62,7 +62,7 @@ class UserWithProfileUpdateSerializer(serializers.Serializer):
 
 class CreateUserSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(max_length=128)
-    rapidpro_uuid = serializers.CharField(max_length=36, required=False)
+    rapidpro_uuid = serializers.CharField(max_length=36, required=False, allow_blank=True)
 
     class Meta:
         model = User
