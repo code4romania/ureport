@@ -53,7 +53,7 @@ class BadgeType(SmartModel):
         help_text=_(
             "Template for the text to be displayed for badges which have not been earned yet. "
             "Use ${read_count} ${left_count} ${pluralize_stories_read} ${pluralize_stories_left} as placeholders for "
-            "the total number of items already be read in category, the number of items left to be read, "
+            "the total number of items already read in category, the number of items left to be read, "
             "the translated plural form of the item type (story, article, ...)"
         ))
     finished_description = models.TextField(
