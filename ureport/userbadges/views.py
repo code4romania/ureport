@@ -18,7 +18,7 @@ from ureport.apiextras.views import (
 from ureport.userbadges.forms import BadgeTypeForm
 from ureport.userbadges.serializers import (
     UserBadgeSerializer,
-    BadgeTypeSerializer,
+    UserBadgeTypeSerializer,
 )
 from ureport.userbadges.models import BadgeType, UserBadge
    
@@ -141,7 +141,7 @@ class UserBadgeViewSet(ModelViewSet):
                     "image":"https://example.com/media/userbadges/icon.png",
                     "description":"You have 5 more stories to read in order to receive this badge.",
                     "validation_category":1,
-                    "item_category":1,  # Deprecated
+                    "owned":true
                 },
                 ...
             ]
@@ -155,7 +155,12 @@ class UserBadgeViewSet(ModelViewSet):
         else:
             filtered_queryset = queryset
         
-        # TODO: send the read counts to the serializer
-        serializer = BadgeTypeSerializer(filtered_queryset, many=True)
+        context = {
+            "user_id": request.user.id,
+            "org_id": org_id,
+            "owned_type_ids": list(  # TODO: Cache this!
+                UserBadge.objects.filter(user_id=user_id).values_list("badge_type_id", flat=True))
+        }
+        serializer = UserBadgeTypeSerializer(filtered_queryset, many=True, context=context)
 
         return Response(serializer.data)
