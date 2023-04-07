@@ -18,6 +18,7 @@ from ureport.apiextras.views import (
 from ureport.userbadges.forms import BadgeTypeForm
 from ureport.userbadges.serializers import (
     UserBadgeSerializer,
+    BadgeTypeSerializer,
 )
 from ureport.userbadges.models import BadgeType, UserBadge
    
@@ -109,11 +110,52 @@ class UserBadgeViewSet(ModelViewSet):
                     },
                     "user":321,
                     "offered_on":"2023-03-07T20:56:53.198494+02:00"
-                }
+                },
+                ...
             ]
         """
         
         queryset = self.get_queryset().filter(user_id=user_id)
         filtered_queryset = self.filter_queryset(queryset)
         serializer = UserBadgeSerializer(filtered_queryset, many=True)
+        return Response(serializer.data)
+
+
+    @action(detail=False, methods=['get'], url_path=USER_API_PATH)
+    def retrieve_user_badge_types(self, request: HttpRequest, user_id: int) -> HttpResponse:
+        """
+        Get all badge types and their progress for the specified user (optionally filtered by Org)
+
+
+        Example:
+
+            GET /api/v1/userbadges/user/321/all/?org=1
+
+        Result:
+
+            [
+                {
+                    "id":1,
+                    "org":1,
+                    "title":"First badge",
+                    "image":"https://example.com/media/userbadges/icon.png",
+                    "description":"You have 5 more stories to read in order to receive this badge.",
+                    "validation_category":1,
+                    "item_category":1,  # Deprecated
+                },
+                ...
+            ]
+        """
+        
+        queryset = BadgeType.visible.all()
+        
+        org_id = self.request.query_params.get("org")
+        if org_id:
+            filtered_queryset = queryset.filter(org=org_id)
+        else:
+            filtered_queryset = queryset
+        
+        # TODO: send the read counts to the serializer
+        serializer = BadgeTypeSerializer(filtered_queryset, many=True)
+
         return Response(serializer.data)

@@ -194,7 +194,7 @@ urlpatterns = [
         name="api.v1.storyrewards_for_user"
     ),
 
-    # UserBadges API
+    # UserBadges and Badge Types API
     re_path(
         r"^userbadges/$", 
         UserBadgeViewSet.as_view({
@@ -219,6 +219,13 @@ urlpatterns = [
             "get": "retrieve_user_badges",
         }), 
         name="api.v1.userbadges_for_user"
+    ),
+    re_path(
+        r"^userbadges/user/(?P<user_id>[\d]+)/all/$",
+        UserBadgeViewSet.as_view({
+            "get": "retrieve_user_badge_types",
+        }), 
+        name="api.v1.userbadges_types_for_user"
     ),
 
     # UserProfiles API
