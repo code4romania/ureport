@@ -98,7 +98,7 @@ class BadgeType(SmartModel):
             "read_count": read_count,
             "left_count": left_count,
             "pluralize_stories_read": pluralize_lazy % {"count": read_count},
-            "pluralize_stories_left": pluralize_lazy % {"count": read_count},
+            "pluralize_stories_left": pluralize_lazy % {"count": left_count},
         }
         return string.Template(self.unfinished_template).safe_substitute(data)
 
