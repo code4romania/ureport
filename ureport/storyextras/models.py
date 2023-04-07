@@ -114,6 +114,20 @@ class StoryReward(StoryUserModel):
 
 
 class CategoryExtras:
+
+    @staticmethod
+    def is_parent_category(category: Category) -> bool:
+        """
+        Returns True if the (sub)category is a parent one
+        """
+
+        sep = settings.SUBCATEGORY_SEPARATOR
+
+        if not category or not sep in category.name:
+            return False
+        else:
+            return True
+        
     
     @staticmethod
     def get_parent_category(subcategory: Category) -> Optional[Category]:
