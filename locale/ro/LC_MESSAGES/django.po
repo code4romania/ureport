@@ -2069,7 +2069,7 @@ msgstr "Parola a fost actualizată cu succes, îți mulțumim."
 
 #, python-format
 msgid "You are now logged in as %s"
-msgstr "Acum tu ești conectat ca %s"
+msgstr "Acum te-ai conectat drept %s"
 
 msgid ""
 "Password Updated Successfully. Now you can log in using your new password."
@@ -2337,14 +2337,12 @@ msgstr "CAUTĂ"
 msgid "No results found"
 msgstr "Niciun rezultat găsit"
 
-#, fuzzy
 msgid "RESPONDERS"
 msgstr "RESPONDENȚI"
 
 msgid "RESPONSE RATE"
 msgstr "RATĂ DE RĂSPUNS"
 
-#, fuzzy
 msgid "TOTAL RESPONDERS"
 msgstr "TOTAL RESPONDENȚI"
 
@@ -2367,7 +2365,6 @@ msgstr "LOCAȚIE"
 msgid "Written by:"
 msgstr "Scris de către:"
 
-#, fuzzy
 msgid "REPORT"
 msgstr "RAPORT"
 
@@ -2386,7 +2383,6 @@ msgstr "District"
 msgid "Participation Level"
 msgstr "Nivel de participare"
 
-#, fuzzy
 msgid "Responders"
 msgstr "Respondenți"
 
@@ -2540,7 +2536,8 @@ msgid ""
 "          "
 msgstr ""
 "\n"
-"Ești sigur că vrei să elimini 1 %(object)s1?"
+"            Sigur vrei să ștergi <strong>%(object)s</strong>?\n"
+"          "
 
 #, fuzzy, python-format
 #| msgid ""
@@ -2591,8 +2588,8 @@ msgid ""
 "              "
 msgstr ""
 "\n"
-"Ne pare rău, nu vă puteți autentifica în acest moment, deoarece am primit "
-"1 %(failed_login_limit)s încercări de conectare incorecte."
+"Nu vă puteți autentifica în acest moment, deoarece am primit "
+"%(failed_login_limit)s încercări de conectare incorecte."
 
 #, python-format
 msgid ""
@@ -2602,7 +2599,7 @@ msgid ""
 "                  "
 msgstr ""
 "\n"
-"Vă rugăm să așteptați 1 %(lockout_timeout)s minute înainte să încercați "
+"Așteptați 1 %(lockout_timeout)s minute înainte să încercați "
 "să vă autentificați din nou."
 
 #, python-format
@@ -2634,7 +2631,6 @@ msgstr "Descrierea acestui robot, opțională"
 msgid "Whether this bot is featured and displayed on the homepage"
 msgstr "Dacă acest sondaj ar trebui să fie afișat pe pagina principală"
 
-#, fuzzy
 msgid "Or"
 msgstr "Sau"
 
@@ -2671,7 +2667,7 @@ msgid_plural ""
 "            "
 msgstr[0] ""
 "\n"
-"             %(counter)s rezultate\n"
+"             %(counter)s rezultat\n"
 "           "
 msgstr[1] ""
 "\n"
@@ -2679,7 +2675,7 @@ msgstr[1] ""
 "            "
 msgstr[2] ""
 "\n"
-"              %(counter)s rezultate\n"
+"              %(counter)s de rezultate\n"
 "            "
 
 msgid ""
@@ -2688,7 +2684,8 @@ msgid ""
 "           "
 msgstr ""
 "\n"
-"Results 1 %(start)s-%(end)s din %(count)s"
+"             Rezultate %(start)s-%(end)s din %(count)s\n"
+"           "
 
 #, fuzzy
 #| msgid ""
@@ -2711,21 +2708,21 @@ msgid_plural ""
 "                  "
 msgstr[0] ""
 "\n"
-"                  %(questions)s ca și întrebarea chestionată pe acest "
-"subiect\n"
+"                  %(questions)s întrebare de sondaj\n"
 "                "
 msgstr[1] ""
 "\n"
-"                  %(questions)s ca și întrebarea chestionată pe acest "
-"subiect\n"
+"                  %(questions)s întrebari de sondaj\n"
+"\n"
+"\n"
 "                "
 msgstr[2] ""
 "\n"
-"                  %(questions)s ca și întrebarea chestionată pe acest "
-"subiect\n"
+"                  %(questions)s de întrebari de sondaj\n"
+"\n"
+"\n"
 "                "
 
-#, fuzzy
 msgid "questions"
 msgstr "întrebări"
 
@@ -2833,7 +2830,8 @@ msgid ""
 "                                  "
 msgstr ""
 "\n"
-"%(responded)s de %(total)s"
+"                                  %(responded)s din %(total)s\n"
+"                                  "
 
 msgid "TRENDING WORDS"
 msgstr "CUVINTE CHEIE"
@@ -2950,7 +2948,8 @@ msgid ""
 "                  "
 msgstr ""
 "\n"
-"%(responded)s au răspuns din %(polled)s chestionați"
+"                    %(responded)s au răspuns din %(polled)s sondați\n"
+"                  "
 
 msgid "KEYWORDS"
 msgstr "CUVINTE CHEIE"
