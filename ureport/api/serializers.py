@@ -18,7 +18,7 @@ from ureport.polls.models import Poll
 
 
 def generate_absolute_url_from_file(request, file, thumbnail_geometry):
-    thumnail = get_thumbnail(file, thumbnail_geometry, crop="center", quality=99)
+    thumnail = get_thumbnail(file, thumbnail_geometry, quality=100)
     return request.build_absolute_uri(thumnail.url)
 
 
