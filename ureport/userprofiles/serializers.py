@@ -85,6 +85,8 @@ class CreateUserSerializer(serializers.ModelSerializer):
         first_name = split_name[0]
         if len(split_name) > 1:
             last_name = split_name[1]
+        else:
+            last_name = ""
 
         user = User(
             email=validated_data.get("email"),

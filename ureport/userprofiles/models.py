@@ -86,7 +86,14 @@ class UserProfile(models.Model):
 
     @property
     def full_name(self) -> str:
-        return "{} {}".format(self.user.first_name, self.user.last_name)
+        if self.user.first_name and self.user.last_name:
+            return "{} {}".format(self.user.first_name, self.user.last_name)
+        elif self.user.first_name:
+            return "{}".format(self.user.first_name)
+        elif self.user.last_name:
+            return "{}".format(self.user.last_name)
+        else:
+            return ""
 
     def is_social_auth(self) -> bool:
         """
