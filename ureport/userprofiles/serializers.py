@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.contrib.auth import password_validation
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.translation import gettext_lazy as _
@@ -79,6 +80,9 @@ class CreateUserSerializer(serializers.ModelSerializer):
         else:
             return clean_email
 
+    def validate_password(self, value: str) -> str:
+        return password_validation.validate_password(value)
+
     def create(self, validated_data: dict) -> User:
         split_name = validated_data.get("full_name","").split(" ")
         
@@ -130,6 +134,9 @@ class ResetPasswordSerializer(serializers.Serializer):
 
         return data
 
+    def validate_new_password(self, value: str) -> str:
+        return password_validation.validate_password(value)
+
     def save(self) -> User:
         if self.validated_data.get("code"):
             # We have a validated code
@@ -161,6 +168,9 @@ class ChangePasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(max_length=128)
     new_password2 = serializers.CharField(max_length=128)
 
+    def validate_new_password(self, value: str) -> str:
+        return password_validation.validate_password(value)
+    
     def validate(self, data: dict) -> dict:
         if not self.instance:
             raise serializers.ValidationError(_("User does not exist"))
