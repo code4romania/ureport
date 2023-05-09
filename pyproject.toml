@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-Django = "^4.0.8"
+Django = "~4.0.10"
 smartmin = "^4.0.0"
 rapidpro-dash = "^1.9.3"
 colorama = "^0.4.3"
@@ -23,7 +23,7 @@ dj-database-url = "^0.5.0"
 boto3 = "^1.7.67"
 Pillow = "^9.1.1"
 gunicorn = "^20.1.0"
-pisa = "^3.0.33"
+pisa = { url = "https://files.pythonhosted.org/packages/00/be/1e641eb27dbcf6a061167aff23b4d628ce8d062de6aa1df871d8d8737f62/pisa-3.0.33.tar.gz" }
 sentry-sdk = "^0.19.5"
 django-redis = "^4.11.0"
 psycopg2-binary = "^2.8.6"
@@ -48,7 +48,7 @@ social-auth-app-django = "^5.2.0"
 black = "^22.3"
 isort = "^5.9.3"
 flake8 = "^3.7.9"
-codecov = "^2.1.11"
+codecov = "^2.1.13"
 
 [tool.black]
 line-length = 119
