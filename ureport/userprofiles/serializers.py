@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from ureport.userprofiles.models import UserProfile
+from ureport.userprofiles.password_validation import DifferentPasswordValidator
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -81,7 +82,8 @@ class CreateUserSerializer(serializers.ModelSerializer):
             return clean_email
 
     def validate_password(self, value: str) -> str:
-        return password_validation.validate_password(value)
+        password_validation.validate_password(value)
+        return value
 
     def create(self, validated_data: dict) -> User:
         split_name = validated_data.get("full_name","").split(" ")
@@ -135,7 +137,8 @@ class ResetPasswordSerializer(serializers.Serializer):
         return data
 
     def validate_new_password(self, value: str) -> str:
-        return password_validation.validate_password(value)
+        password_validation.validate_password(value, user=self.instance or None)
+        return value
 
     def save(self) -> User:
         if self.validated_data.get("code"):
@@ -169,7 +172,13 @@ class ChangePasswordSerializer(serializers.Serializer):
     new_password2 = serializers.CharField(max_length=128)
 
     def validate_new_password(self, value: str) -> str:
-        return password_validation.validate_password(value)
+        # Run the default validators
+        password_validation.validate_password(value, user=self.instance or None)
+        # Run the custom Change Password validators
+        if self.instance:
+            password_validation.validate_password(
+                value, user=self.instance, password_validators=[DifferentPasswordValidator(),])
+        return value
     
     def validate(self, data: dict) -> dict:
         if not self.instance:
