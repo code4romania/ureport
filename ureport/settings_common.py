@@ -6,14 +6,13 @@ import sys
 from datetime import timedelta
 
 import sentry_sdk
+from celery.schedules import crontab
 from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration, ignore_logger
 
 from django.forms import Textarea
 from django.utils.translation import gettext_lazy as _
-
-from celery.schedules import crontab
 
 SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
 
@@ -117,6 +116,7 @@ LANGUAGES = (
     ("no", "Norwegian"),
     ("ru", "Russia"),
     ("el", "Greek"),
+    ("th", "Thai"),
 )
 
 DEFAULT_LANGUAGE = "en"
@@ -330,6 +330,14 @@ ORG_CONFIG_FIELDS = [
         field=dict(
             help_text=_("The viber username that users will use to contact U-Report if you have one"),
             label="Viber Username",
+            required=False,
+        ),
+    ),
+    dict(
+        name="line_link",
+        field=dict(
+            help_text=_("The Line bot link that users will use to contact U-Report if you have one"),
+            label="Line Link",
             required=False,
         ),
     ),
@@ -1099,10 +1107,10 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(hour=2, minute=0),
         "args": ("ureport.stats.tasks.refresh_engagement_data", "slow"),
     },
-    "update-old-contact-activity": {
+    "delete-old-contact-activity": {
         "task": "dash.orgs.tasks.trigger_org_task",
         "schedule": crontab(hour=22, minute=0),
-        "args": ("ureport.stats.tasks.update_used_contact_activities", "slow"),
+        "args": ("ureport.stats.tasks.delete_old_contact_activities", "slow"),
     },
     "rebuild-poll-results-count": {
         "task": "polls.rebuild_counts",
@@ -1121,6 +1129,12 @@ CELERY_BEAT_SCHEDULE = {
     "polls_stats_squash": {
         "task": "polls.polls_stats_squash",
         "schedule": timedelta(minutes=30),
+        "relative": True,
+        "options": {"queue": "slow"},
+    },
+    "stats_activities_squash": {
+        "task": "stats.squash_contact_activities_counts",
+        "schedule": timedelta(hours=6),
         "relative": True,
         "options": {"queue": "slow"},
     },

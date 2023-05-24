@@ -49,12 +49,12 @@ class PublicTest(UreportTest):
         self.login(self.admin)
         response = self.client.get(edit_url, SERVER_NAME="nigeria.ureport.io")
         self.assertTrue("form" in response.context)
-        self.assertEqual(len(response.context["form"].fields), 45)
+        self.assertEqual(len(response.context["form"].fields), 46)
 
         self.login(self.superuser)
         response = self.client.get(edit_url, SERVER_NAME="nigeria.ureport.io")
         self.assertTrue("form" in response.context)
-        self.assertEqual(len(response.context["form"].fields), 64)
+        self.assertEqual(len(response.context["form"].fields), 65)
 
     def test_count(self):
         count_url = reverse("public.count")
@@ -403,7 +403,6 @@ class PublicTest(UreportTest):
         # self.assertContains(response, "All U-Report services (all msg on 3000) are free.")
 
     def test_poll_results(self):
-
         poll1 = self.create_poll(self.uganda, "Poll 1", "uuid-1", self.health_uganda, self.admin, has_synced=True)
 
         question1 = self.create_poll_question(self.admin, poll1, "question poll 1", "uuid-101")
@@ -843,7 +842,6 @@ class PublicTest(UreportTest):
         self.assertFalse(story4 in response.context["stories"])
 
     def test_story_read(self):
-
         education_uganda = Category.objects.create(
             org=self.uganda, name="Education", created_by=self.admin, modified_by=self.admin
         )

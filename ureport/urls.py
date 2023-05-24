@@ -72,7 +72,6 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-
     try:
         import debug_toolbar
 

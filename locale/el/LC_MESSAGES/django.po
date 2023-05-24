@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-12 09:17+0000\n"
+"POT-Creation-Date: 2023-03-28 10:56+0000\n"
 "PO-Revision-Date: 2021-03-30 14:28+0000\n"
 "Last-Translator: Artemis Papakostouli, 2022\n"
 "Language-Team: Greek (https://www.transifex.com/rapidpro/teams/226/el/)\n"
@@ -1749,6 +1749,11 @@ msgstr "Το Telegram bot που θα χρησιμοποιήσουν οι χρή
 
 msgid "The viber username that users will use to contact U-Report if you have one"
 msgstr "Το όνομα χρήστη viber που θα χρησιμοποιήσουν οι χρήστες για να επικοινωνήσουν με το U-Report, αν έχετε"
+
+#, fuzzy
+#| msgid "The Telegram bot that users will use to contact U-Report if you have one"
+msgid "The Line bot link that users will use to contact U-Report if you have one"
+msgstr "Το Telegram bot που θα χρησιμοποιήσουν οι χρήστες για να επικοινωνήσουν με το U-Report εάν έχετε"
 
 msgid "The join button text"
 msgstr "Το κείμενο του κουμπιού Εγγραφή"
