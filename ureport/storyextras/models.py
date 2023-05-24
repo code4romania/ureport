@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, IntegrityError
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -41,6 +41,13 @@ def auto_create_story_settings(sender, instance, **kwargs):
             StorySettings.objects.create(story=instance)
         except IntegrityError:
             pass
+
+
+@receiver(pre_save, sender=Story)
+def story_content_html_cleanup(sender, instance, **kwargs):
+    content = instance.content
+    # TODO: Content cleanup
+    instance.content = content
 
 
 class StoryUserModel(models.Model):
