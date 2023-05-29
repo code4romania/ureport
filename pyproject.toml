@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ureport"
-version = "1.2.70-1"
+version = "1.2.70-2"
 description = "U-Report dashboard built on data collected by RapidPro"
 authors = ["Nyaruka Ltd <code@nyaruka.com>"]
 readme = "README.md"
@@ -39,7 +39,8 @@ Markdown = "^2.6.11"
 iso8601 = "^0.1.12"
 sorl-thumbnail = "^12.9.0"
 stop_words = "^2018.7.23"
-social-auth-app-django = "^5.2.0"  # code4
+social-auth-app-django = "~5.2.0"  # code4
+bleach = {version="~6.0.0", extras=["css"]}  # code4
 
 [tool.poetry.dev-dependencies]
 black = "^23.1"

@@ -37,6 +37,8 @@ if os.getenv("PRODUCTION", "").strip().lower() in ["1", "true", "yes"]:
 else:
     PRODUCTION = False
 
+# Remove any extra HTML code from the story content right before saving it
+SANITIZE_STORY_INPUT = False
 
 DEBUG = True
 

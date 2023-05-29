@@ -1,3 +1,5 @@
+import bleach
+from bleach.css_sanitizer import CSSSanitizer
 from typing import Optional, List
 
 from dash.stories.models import Story, Category
@@ -45,9 +47,38 @@ def auto_create_story_settings(sender, instance, **kwargs):
 
 @receiver(pre_save, sender=Story)
 def story_content_html_cleanup(sender, instance, **kwargs):
-    content = instance.content
-    # TODO: Content cleanup
-    instance.content = content
+    if not settings.SANITIZE_STORY_INPUT:
+        return
+
+    css_sanitizer = CSSSanitizer(
+        allowed_css_properties=[
+            "background-color", "color", 
+            "font-family", "font-weight", "font-size", 
+            "width",
+        ])
+
+    if instance.content:
+        content = bleach.clean(
+            instance.content,
+            tags={
+                "pre", "h1", "h2", "h3", "h4", "h5", "h6",
+                "b", "u", "i",
+                "br", "p", "div", "span",
+                "ol", "ul", "li",
+                "table", "tr", "td",
+                "a", "img", "iframe",
+            },
+            attributes={
+                "span": ["style"],
+                "div": ["align"],
+                "a": ["href", "target"],
+                "img": ["style", "src"],
+                "iframe": ["src", "width", "height", "frameborder"],
+            },
+            css_sanitizer=css_sanitizer,
+            strip=True,
+        )
+        instance.content = content
 
 
 class StoryUserModel(models.Model):
